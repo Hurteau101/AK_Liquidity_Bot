@@ -151,7 +151,7 @@ class Novig:
     def calculate_liquidity(qty, price):
         return (1-price) * (qty / 100)
 
-    def _get_highest_order(self, orders, direction_description):
+    def _get_highest_order(self, orders, direction_description, link_id):
         if not orders:
             return None
 
@@ -172,6 +172,7 @@ class Novig:
             "total_liquidity": round(total_liquidity, 2),
             "cost_avg_odds": round(self.price_to_american(weighted_avg_price), 2),
             "side": side,
+            "link":f"https://novig.onelink.me/JHQQ/events/{link_id}"
         }
 
     def _get_line(self, description):
@@ -220,7 +221,7 @@ class Novig:
                             if order.get("status") == "OPEN"
                         ],
                         liquidity_data=LiquidityData(
-                            highest_order=self._get_highest_order(outcome.get("orders", []), outcome.get("description"))
+                            highest_order=self._get_highest_order(outcome.get("orders", []), outcome.get("description"), outcome.get("id"))
                         ),
                         game_details=GameDetails(
                             game_title=event.get("description"),

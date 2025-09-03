@@ -68,6 +68,18 @@ class DiscordBot:
             "inline": False
         })
 
+        link_fields = [
+            {
+                "name": f"{order_data.get('side').title()} {market_data.get('additional_data').get('line')} Link",
+                "value": f"**↠** [Novig App]({order_data.get('link')})",
+                "inline": False
+            }
+            for side, data in market_data.get("liquidity", {}).items()
+            if (order_data := data.get("highest_order"))
+        ]
+
+        fields.extend(link_fields)
+
         return {
             "title": main_title,
             "color": 0x5D3A9B,
