@@ -11,20 +11,13 @@ celery_app = Celery(
 
 celery_app.conf.beat_schedule = {
     "send_notifications": {
-        "task": "notification.notify_user",
+        "task": "celery_notification.notify_user",
         "schedule": timedelta(seconds=30),
     }
 }
 
-@celery_app.task(name="notification.notify_user")
+@celery_app.task(name="celery_notification.notify_user")
 def notify_user():
     leagues = ["NFL"]
     novig_instance = Novig(leagues)
     asyncio.run(novig_instance.run())
-
-
-
-
-
-# celery -A notification worker --loglevel=info --pool=solo
-# celery -A notification beat --loglevel=info
