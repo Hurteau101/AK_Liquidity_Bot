@@ -6,7 +6,7 @@ from discord_sender import DiscordBot
 
 class RedisManager:
     def __init__(self):
-        self.redis_client = redis.Redis(host="localhost", port=6379, db=4, decode_responses=True)
+        self.redis_client = redis.Redis(host="localhost", port=6379, db=1, decode_responses=True)
         self.discord_bot = DiscordBot()
 
 
