@@ -1,0 +1,76 @@
+{
+  "WNBA": [
+    {
+      "raw_name": "points_rebounds_assists",
+      "display_name": "Points, Rebounds, and Assists",
+      "active": true
+    },
+    {
+      "raw_name": "points",
+      "display_name": "Points",
+      "active": true
+    },
+    {
+      "raw_name": "rebounds_assists",
+      "display_name": "Rebounds and Assists",
+      "active": true
+    },
+    {
+      "raw_name": "points_assists",
+      "display_name": "Points and Assists",
+      "active": true
+    },
+    {
+      "raw_name": "points_rebounds",
+      "display_name": "Points and Rebounds",
+      "active": true
+    },
+    {
+      "raw_name": "three_pointers_made",
+      "display_name": "Three Pointers Made",
+      "active": true
+    },
+        {
+      "raw_name": "double_double",
+      "display_name": "Double-Double",
+      "active": true
+    }
+  ],
+    "NFL": [
+        {
+        "raw_name": "rushing_yards",
+        "display_name": "Rushing Yards",
+        "active": true
+        },
+      {
+        "raw_name": "rushing_attempts",
+        "display_name": "Rushing Attempts",
+        "active": true
+        },
+        {
+        "raw_name": "longest_rush",
+        "display_name": "Longest Rush",
+        "active": true
+        },
+        {
+        "raw_name": "passing_yards",
+        "display_name": "Passing Yards",
+        "active": true
+        },
+        {
+        "raw_name": "receiving_yards",
+        "display_name": "Receiving Yards",
+        "active": true
+        },
+        {
+        "raw_name": "receptions",
+        "display_name": "Receptions",
+        "active": true
+        },
+      {
+        "raw_name": "longest_reception",
+        "display_name": "Longest Receptions",
+        "active": true
+        }
+    ]
+}
