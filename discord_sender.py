@@ -63,7 +63,7 @@ class DiscordBot:
                      f"\nCost Avg Odds: {DiscordBot.format_odds(over_data.get('cost_avg_odds', 0))}\n\n"
                      f"Total Under: ${under_data.get('total_liquidity', 0)}"
                      f"\nCost Avg Odds: {DiscordBot.format_odds(under_data.get('cost_avg_odds', 0))}\n\n"
-                     f"Highest Order: ${highest.get('total_liquidity', 0)} [{highest.get('side').title()}]\n"
+                     f"Highest Order: ${highest.get('liquidity_left', 0)} [{highest.get('side').title()}]\n"
                      f"Highest Order Odds: {DiscordBot.format_odds(highest.get('american_price', 0))}\n```",
             "inline": False
         })
