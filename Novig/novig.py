@@ -172,6 +172,7 @@ class Novig:
             "total_liquidity": round(total_liquidity, 2),
             "cost_avg_odds": round(self.price_to_american(weighted_avg_price), 2),
             "side": side,
+            "outcome_id": link_id,
             "link":f"https://novig.onelink.me/JHQQ/events/{link_id}"
         }
 
@@ -273,7 +274,7 @@ class Novig:
                     if player_data:
                         redis.manger(player_data, league)
 
-
+            #
             # with open("final.json", "w") as file:
             #     json.dump(data_by_league, file, indent=4)
 

@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 import redis
 
+from database import Database
 from discord_sender import DiscordBot
 
 
@@ -28,6 +29,7 @@ class RedisManager:
             return
 
         pipeline = self.redis_client.pipeline()
+        db = Database()
 
         for player in player_data:
             player_key = player.get("key_name")
@@ -42,8 +44,13 @@ class RedisManager:
                 # New player
                 self.store_player(pipeline, player_key, player_liquidity_difference, start_date_dt)
                 self.discord_bot.discord_message(player, market_changed=False)
+                db.insert_data(player, league)
+
 
             elif abs(float(redis_current_diff) - player_liquidity_difference) >= 1000:
                 # Existing player but difference changed a lot
                 self.store_player(pipeline, player_key, player_liquidity_difference, start_date_dt)
                 self.discord_bot.discord_message(player, market_changed=True)
+                db.insert_data(player, league)
+
+        db.close()
