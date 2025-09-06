@@ -173,7 +173,8 @@ class Novig:
             "cost_avg_odds": round(self.price_to_american(weighted_avg_price), 2),
             "side": side,
             "outcome_id": link_id,
-            "link":f"https://novig.onelink.me/JHQQ/events/{link_id}"
+            "mobile_link": f"https://novig.onelink.me/JHQQ/events/{link_id}",
+            "desktop_link": f"https://app.novig.us/events/{link_id}"
         }
 
     def _get_line(self, description):

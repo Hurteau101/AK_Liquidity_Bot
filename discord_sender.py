@@ -71,7 +71,7 @@ class DiscordBot:
         link_fields = [
             {
                 "name": f"{order_data.get('side').title()} {market_data.get('additional_data').get('line')} Link",
-                "value": f"**↠** [Novig App]({order_data.get('link')})",
+                "value": f"**↠** [Mobile]({order_data.get('mobile_link')}) | [Desktop]({order_data.get('desktop_link')})",
                 "inline": False
             }
             for side, data in market_data.get("liquidity", {}).items()
@@ -87,7 +87,7 @@ class DiscordBot:
                 "name": "Novig Bot",
             },
             "footer": {
-                "text": "V1.0.0\n"
+                "text": "V1.0.1\n"
                         "Powered by DifferentOdds"
             },
             "fields": fields,
