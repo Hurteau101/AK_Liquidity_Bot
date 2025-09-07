@@ -30,6 +30,7 @@ class CSV_Bot(commands.Cog):
             'total_over_liquidity as "Total Over Liquidity", '
             'total_under_liquidity as "Total Under Liqudity", '
             'highest_order_side as "Highest Order Side", '
+            'liquidity_highest_order as "Highest Order Liquidity", '
             'odds_highest_order as "Hights Order Odds", '
             'liquidity_difference as "Liqudity Difference", '
             'league as "League" FROM novig_tracking',
