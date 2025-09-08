@@ -1,5 +1,5 @@
 import os
-
+from psycopg2.extras import execute_values
 import psycopg2
 from dotenv import load_dotenv
 
@@ -91,10 +91,43 @@ class Database:
 
         self.conn.commit()
 
+    def get_outcome_ids(self):
+        self.cursor.execute("""
+            SELECT outcome_id
+            FROM (
+                SELECT over_outcome_id AS outcome_id
+                FROM novig_tracking
+                WHERE over_result IS NULL AND over_outcome_id IS NOT NULL
+
+                UNION
+
+                SELECT under_outcome_id AS outcome_id
+                FROM novig_tracking
+                WHERE under_result IS NULL AND under_outcome_id IS NOT NULL
+            ) AS combined
+        """)
+        return [row[0] for row in self.cursor.fetchall()]
+
+    def bulk_update_results(self, results):
+        sql = """
+            UPDATE novig_tracking t
+            SET 
+                over_result  = CASE WHEN t.over_outcome_id  = v.outcome_id THEN v.result ELSE t.over_result END,
+                under_result = CASE WHEN t.under_outcome_id = v.outcome_id THEN v.result ELSE t.under_result END
+            FROM (VALUES %s) AS v(outcome_id, result)
+            WHERE t.over_outcome_id = v.outcome_id
+               OR t.under_outcome_id = v.outcome_id
+        """
+
+        execute_values(self.cursor, sql, results)
+        self.conn.commit()
+
+
     def close(self):
         self.cursor.close()
         self.conn.close()
 
 if __name__ == "__main__":
     db = Database()
-    db.create_tracking_table()
+    # db.create_tracking_table()
+    result = db.get_outcome_ids()
