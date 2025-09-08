@@ -26,6 +26,7 @@ class CSV_Bot(commands.Cog):
         msg = await ctx.send("Generating Novig Excel File, please wait...")
         df = pd.read_sql(
             'SELECT snapshot_time AS "snapshot", player_name as "Player Name", '
+            'game_start_time as "Game Start Time", '
             'stat_type as "Stat Type", line as "Line", game_title as "Game Title", '
             'total_over_liquidity as "Total Over Liquidity", '
             'total_under_liquidity as "Total Under Liqudity", '
@@ -33,7 +34,10 @@ class CSV_Bot(commands.Cog):
             'liquidity_highest_order as "Highest Order Liquidity", '
             'odds_highest_order as "Hights Order Odds", '
             'liquidity_difference as "Liqudity Difference", '
-            'league as "League" FROM novig_tracking',
+            'league as "League",'
+            'over_result as "Over Result",'
+            'under_result as "Under Result" FROM novig_tracking',
+
             self.engine
         )
         df["snapshot"] = df["snapshot"].dt.tz_localize(None)
