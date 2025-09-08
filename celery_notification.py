@@ -2,6 +2,7 @@ import asyncio
 from datetime import timedelta
 from celery import Celery
 from Novig.novig import Novig
+from Novig.novg_results import Results
 
 celery_app = Celery(
     "notify_user_celery",
@@ -22,7 +23,6 @@ celery_app.conf.beat_schedule = {
 
 @celery_app.task(name="celery_notification.update_results")
 def update_results():
-    from results import Results
     results_instance = Results()
     results_instance.get_results()
 
