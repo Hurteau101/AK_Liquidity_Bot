@@ -44,7 +44,7 @@ class Novig:
         market_data = await self.novig_api.query_caller(session, "market", event_id=event_id)
         market_data = self._extract_data(market_data, league)
         filtered_data = self._group_filter(market_data)
-        return self._conditional_filter(filtered_data, filter_type="compare_difference", amount=3000)
+        return self._conditional_filter(filtered_data, filter_type="compare_difference", amount=4000)
 
         # return filtered_data
         # return market_data_change
@@ -98,7 +98,14 @@ class Novig:
 
             liqudity_difference = round(abs(over_liquidity_amount - under_liquidity_amount),2)
 
-            if liqudity_difference >= difference_amount:
+            over_highest_amount = data.get("liquidity", {}).get("over", {}).get("highest_order")
+            under_highest_amount = data.get("liquidity", {}).get("under", {}).get("highest_order")
+
+            if liqudity_difference >= difference_amount and (
+                ((over_highest_amount or {}).get("liquidity_left", 0) >= 3000)
+                or
+                ((under_highest_amount or {}).get("liquidity_left", 0) >= 3000)
+            ):
                 data["liqudity_difference"] = liqudity_difference
                 results.append(data)
 
@@ -108,6 +115,8 @@ class Novig:
         filters = {
             "compare_difference": self._difference_filter,
         }
+
+        filter_data = None
 
         if filter_type not in filters:
             raise ValueError(f"Invalid filter type: {filter_type}")

@@ -43,7 +43,6 @@ class Database:
         self.conn.commit()
 
     def insert_data(self, record, league):
-        # Common fields from additional_data
         additional = record["additional_data"]
         player_name = additional["player_name"]
         stat_type = additional["stat_type"]
@@ -69,7 +68,7 @@ class Database:
             "total_under_liquidity": under_data.get("total_liquidity", 0),
             "highest_order_side": highest["side"],
             "liquidity_highest_order": highest["liquidity_left"],
-            "oddds_highest_order": highest["american_price"],
+            "odds_highest_order": highest["american_price"],
             "liquidity_difference": liquidity_difference,
             "league": league,
             "over_outcome_id": over_data.get("outcome_id"),
@@ -77,17 +76,42 @@ class Database:
         }
 
         self.cursor.execute("""
-             INSERT INTO novig_tracking (
-                 player_name, stat_type, line, game_title, game_start_time,
-                 total_over_liquidity, total_under_liquidity, highest_order_side, liquidity_highest_order, 
-                 odds_highest_order, liquidity_difference, league, over_outcome_id, under_outcome_id
-             ) VALUES (
-                 %(player_name)s, %(stat_type)s, %(line)s, %(game_title)s, %(game_start_time)s,
-                 %(total_over_liquidity)s, %(total_under_liquidity)s,
-                 %(highest_order_side)s, %(liquidity_highest_order)s, %(oddds_highest_order)s, %(liquidity_difference)s, 
-                 %(league)s, %(over_outcome_id)s, %(under_outcome_id)s
-             )
-         """, data)
+            SELECT id, liquidity_difference 
+            FROM novig_tracking 
+            WHERE player_name=%s AND stat_type=%s AND line=%s AND game_title=%s AND league=%s
+        """, (player_name, stat_type, line, game_title, league))
+
+        existing = self.cursor.fetchone()
+
+        if existing:
+            existing_id, existing_diff = existing
+            if liquidity_difference and (existing_diff is None or liquidity_difference > existing_diff):
+                self.cursor.execute("""
+                    UPDATE novig_tracking SET
+                        game_start_time=%(game_start_time)s,
+                        total_over_liquidity=%(total_over_liquidity)s,
+                        total_under_liquidity=%(total_under_liquidity)s,
+                        highest_order_side=%(highest_order_side)s,
+                        liquidity_highest_order=%(liquidity_highest_order)s,
+                        odds_highest_order=%(odds_highest_order)s,
+                        liquidity_difference=%(liquidity_difference)s,
+                        over_outcome_id=%(over_outcome_id)s,
+                        under_outcome_id=%(under_outcome_id)s
+                    WHERE id=%(id)s
+                """, {**data, "id": existing_id})
+        else:
+            self.cursor.execute("""
+                INSERT INTO novig_tracking (
+                    player_name, stat_type, line, game_title, game_start_time,
+                    total_over_liquidity, total_under_liquidity, highest_order_side, liquidity_highest_order, 
+                    odds_highest_order, liquidity_difference, league, over_outcome_id, under_outcome_id
+                ) VALUES (
+                    %(player_name)s, %(stat_type)s, %(line)s, %(game_title)s, %(game_start_time)s,
+                    %(total_over_liquidity)s, %(total_under_liquidity)s,
+                    %(highest_order_side)s, %(liquidity_highest_order)s, %(odds_highest_order)s, %(liquidity_difference)s, 
+                    %(league)s, %(over_outcome_id)s, %(under_outcome_id)s
+                )
+            """, data)
 
         self.conn.commit()
 
