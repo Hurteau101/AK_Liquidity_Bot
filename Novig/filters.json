@@ -76,6 +76,11 @@
         "raw_name": "passing_completions",
         "display_name": "Passing Completions",
         "active": true
+      },
+      {
+        "raw_name": "passing_attempts",
+        "display_name": "Passing Attempts",
+        "active": true
       }
     ]
 }

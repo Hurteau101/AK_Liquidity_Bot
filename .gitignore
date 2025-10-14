@@ -5,3 +5,4 @@ dump.db
 __pycache__/
 *.pyc
 novig_tracking.xlsx
+.idea/
