@@ -34,10 +34,10 @@ def notify_user():
 
 
 async def _notify_user_async():
-    with open("nfl_filters.json") as f:
+    with open("Novig_Dir/nfl_filters.json") as f:
         nfl_filters = json.load(f)
 
-    with open("nba_filters.json") as f:
+    with open("Novig_Dir/nba_filters.json") as f:
         nba_filters = json.load(f)
 
     nfl_bot = NovigSender(filter_data=nfl_filters, difference_amount=1000, highest_order=3000)
