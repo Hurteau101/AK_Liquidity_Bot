@@ -1,41 +1,4 @@
 {
-  "WNBA": [
-    {
-      "raw_name": "points_rebounds_assists",
-      "display_name": "Points, Rebounds, and Assists",
-      "active": true
-    },
-    {
-      "raw_name": "points",
-      "display_name": "Points",
-      "active": true
-    },
-    {
-      "raw_name": "rebounds_assists",
-      "display_name": "Rebounds and Assists",
-      "active": true
-    },
-    {
-      "raw_name": "points_assists",
-      "display_name": "Points and Assists",
-      "active": true
-    },
-    {
-      "raw_name": "points_rebounds",
-      "display_name": "Points and Rebounds",
-      "active": true
-    },
-    {
-      "raw_name": "three_pointers_made",
-      "display_name": "Three Pointers Made",
-      "active": true
-    },
-        {
-      "raw_name": "double_double",
-      "display_name": "Double-Double",
-      "active": true
-    }
-  ],
     "NFL": [
         {
         "raw_name": "rushing_yards",

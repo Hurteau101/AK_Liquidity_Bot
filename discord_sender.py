@@ -6,10 +6,21 @@ from discordwebhook import Discord
 
 
 class DiscordBot:
-    def __init__(self):
+    def __init__(self, league):
         load_dotenv()
-        self.webhook = os.getenv("DISCORD_WEBHOOK_URL")
+        self.webhook = self._webhook_mapper(league)
         self.discord = Discord(url=self.webhook)
+
+    def _webhook_mapper(self, league):
+        MAPPER = {
+            "nfl": os.getenv("DISCORD_WEBHOOK_URL_NFL"),
+            "nba": os.getenv("DISCORD_WEBHOOK_URL_NBA"),
+        }
+
+        if league.lower() not in MAPPER:
+            raise ValueError(f"League '{league}' is not supported. Supported leagues: {list(MAPPER.keys())}")
+
+        return MAPPER.get(league.lower(), os.getenv("DISCORD_WEBHOOK_URL"))
 
     def discord_message(self, data, market_changed=False):
         stat_type = data.get("additional_data").get("stat_type")
@@ -84,11 +95,7 @@ class DiscordBot:
             "title": main_title,
             "color": 0x5D3A9B,
             "author": {
-                "name": "Novig Bot",
-            },
-            "footer": {
-                "text": "V1.0.1\n"
-                        "Powered by DifferentOdds"
+                "name": f"Novig Bot",
             },
             "fields": fields,
             "timestamp": datetime.now(timezone.utc).isoformat()
