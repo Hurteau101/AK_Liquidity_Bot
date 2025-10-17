@@ -29,7 +29,11 @@ def update_results():
     results_instance.get_results()
 
 @celery_app.task(name="celery_notification.notify_user")
-async def notify_user():
+def notify_user():
+    asyncio.run(_notify_user_async())
+
+
+async def _notify_user_async():
     with open("nfl_filters.json") as f:
         nfl_filters = json.load(f)
 
