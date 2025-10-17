@@ -34,8 +34,8 @@ if __name__ == "__main__":
         with open("nba_filters.json") as f:
             nba_filters = json.load(f)
 
-        nfl_bot = NovigSender(filter_data=nfl_filters, difference_amount=1000, highest_order=3000)
-        nba_bot = NovigSender(filter_data=nba_filters, difference_amount=400, highest_order=1000)
+        nfl_bot = NovigSender(filter_data=nfl_filters, difference_amount=4000, highest_order=3000)
+        nba_bot = NovigSender(filter_data=nba_filters, difference_amount=4000, highest_order=3000)
 
         nfl_data, nba_data = await asyncio.gather(
             nfl_bot.runner(),
