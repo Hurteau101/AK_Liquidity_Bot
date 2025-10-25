@@ -6,10 +6,11 @@ from discord_sender import DiscordBot
 
 
 class ProcessManager:
-    def __init__(self, league, redis_database=1, difference_amount=1000):
+    def __init__(self, league, redis_database=1, difference_amount=1000, market_type="mainlines"):
         self.redis_client = redis.Redis(host="localhost", port=6379, db=redis_database, decode_responses=True)
         self.difference_amount = difference_amount
-        self.discord_bot = DiscordBot(league)
+        self.discord_bot = DiscordBot(league, market_type)
+        self.market_type = market_type
 
     def check_player(self, player_key):
         return self.redis_client.exists(player_key) > 0
@@ -49,11 +50,11 @@ class ProcessManager:
                 # New player
                 self.store_player(pipeline, player_key, player_liquidity_difference, start_date_dt_plus_buffer)
                 self.discord_bot.discord_message(player, market_changed=False)
-                db.insert_data(player, league)
+                db.insert_data(player, league, self.market_type)
 
 
             elif abs(float(redis_current_diff) - player_liquidity_difference) >= self.difference_amount:
                 # Existing player but difference changed a lot
                 self.store_player(pipeline, player_key, player_liquidity_difference, start_date_dt)
                 self.discord_bot.discord_message(player, market_changed=True)
-                db.insert_data(player, league)
+                db.insert_data(player, league, self.market_type)

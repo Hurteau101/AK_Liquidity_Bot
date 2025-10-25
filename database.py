@@ -36,13 +36,14 @@ class Database:
                 liquidity_highest_order NUMERIC,
                 odds_highest_order NUMERIC,
                 liquidity_difference NUMERIC,
-                league TEXT
+                league TEXT,
+                market_type TEXT,
             )
         """)
 
         self.conn.commit()
 
-    def insert_data(self, record, league):
+    def insert_data(self, record, league, market_type):
         additional = record["additional_data"]
         player_name = additional["player_name"]
         stat_type = additional["stat_type"]
@@ -73,6 +74,7 @@ class Database:
             "league": league,
             "over_outcome_id": over_data.get("outcome_id"),
             "under_outcome_id": under_data.get("outcome_id"),
+            "market_type": market_type
         }
 
         self.cursor.execute("""
@@ -104,12 +106,12 @@ class Database:
                 INSERT INTO novig_tracking (
                     player_name, stat_type, line, game_title, game_start_time,
                     total_over_liquidity, total_under_liquidity, highest_order_side, liquidity_highest_order, 
-                    odds_highest_order, liquidity_difference, league, over_outcome_id, under_outcome_id
+                    odds_highest_order, liquidity_difference, league, over_outcome_id, under_outcome_id, market_type
                 ) VALUES (
                     %(player_name)s, %(stat_type)s, %(line)s, %(game_title)s, %(game_start_time)s,
                     %(total_over_liquidity)s, %(total_under_liquidity)s,
                     %(highest_order_side)s, %(liquidity_highest_order)s, %(odds_highest_order)s, %(liquidity_difference)s, 
-                    %(league)s, %(over_outcome_id)s, %(under_outcome_id)s
+                    %(league)s, %(over_outcome_id)s, %(under_outcome_id)s, %(market_type)s
                 )
             """, data)
 

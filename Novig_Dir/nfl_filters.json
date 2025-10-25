@@ -1,35 +1,53 @@
 {
-    "NFL": [
-        {
+  "NFL": {
+    "NFL_Mainlines": [
+      {
+        "raw_name": "spread",
+        "display_name": "Spread",
+        "active": true
+      },
+      {
+        "raw_name": "total",
+        "display_name": "Total",
+        "active": true
+      },
+      {
+        "raw_name": "team_total",
+        "display_name": "Team Total",
+        "active": true
+      }
+    ],
+    "NFL_Props": [
+      {
         "raw_name": "rushing_yards",
         "display_name": "Rushing Yards",
         "active": true
-        },
+      },
       {
         "raw_name": "rushing_attempts",
         "display_name": "Rushing Attempts",
         "active": true
-        },
-        {
+      },
+      {
         "raw_name": "longest_rush",
         "display_name": "Longest Rush",
         "active": true
-        },
-        {
+      },
+      {
         "raw_name": "passing_yards",
         "display_name": "Passing Yards",
         "active": true
-        },
-        {
+      },
+      {
         "raw_name": "receiving_yards",
         "display_name": "Receiving Yards",
         "active": true
-        },
-        {
+      },
+      {
         "raw_name": "receptions",
         "display_name": "Receptions",
         "active": true
-        },
+      },
       {
         "raw_name": "longest_reception",
         "display_name": "Longest Receptions",
@@ -46,4 +64,5 @@
         "active": true
       }
     ]
+  }
 }

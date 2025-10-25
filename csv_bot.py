@@ -50,33 +50,49 @@ class CSV_Bot(commands.Cog):
     #     await ctx.send(file=discord.File(file_path))
 
     @app_commands.command(name="csv", description="Generate an Excel file for a specific league.")
-    @app_commands.describe(league="The league you want to export data for (e.g. NBA, NFL, etc.)")
-    async def csv(self, interaction: discord.Interaction, league: str):
+    @app_commands.describe(
+        league="The league you want to export data for (e.g. NBA, NFL, etc.)",
+        market_type="Type of market (e.g. mainlines, props)"
+    )
+    async def csv(self, interaction: discord.Interaction, league: str, market_type: str):
         league = league.upper()
+        market_type = market_type.lower()
 
-        await interaction.response.send_message(f"Generating Excel file for **{league}**, please wait...",
-                                                ephemeral=True)
+        await interaction.response.send_message(
+            f"Generating Excel file for **{league}**, please wait...",
+            ephemeral=True
+        )
 
-        # Query filtered by league
+        # Define columns dynamically
+        base_columns = [
+            'snapshot_time AS "Snapshot"',
+            'game_start_time AS "Game Start Time"',
+            'stat_type AS "Stat Type"',
+            'line AS "Line"',
+            'game_title AS "Game Title"',
+            'total_over_liquidity AS "Total Over Liquidity"',
+            'total_under_liquidity AS "Total Under Liquidity"',
+            'highest_order_side AS "Highest Order Side"',
+            'liquidity_highest_order AS "Highest Order Liquidity"',
+            'odds_highest_order AS "Highest Order Odds"',
+            'liquidity_difference AS "Liquidity Difference"',
+            'league AS "League"',
+            'over_result AS "Over Result"',
+            'under_result AS "Under Result"',
+            'market_type AS "Market Type"',
+        ]
+
+        # Only include Player Name if NOT mainlines
+        if market_type != "mainlines":
+            base_columns.insert(1, 'player_name AS "Player Name"')
+
+        columns = ",\n       ".join(base_columns)
+
         query = f"""
-           SELECT snapshot_time AS "Snapshot",
-                  player_name AS "Player Name",
-                  game_start_time AS "Game Start Time",
-                  stat_type AS "Stat Type",
-                  line AS "Line",
-                  game_title AS "Game Title",
-                  total_over_liquidity AS "Total Over Liquidity",
-                  total_under_liquidity AS "Total Under Liquidity",
-                  highest_order_side AS "Highest Order Side",
-                  liquidity_highest_order AS "Highest Order Liquidity",
-                  odds_highest_order AS "Highest Order Odds",
-                  liquidity_difference AS "Liquidity Difference",
-                  league AS "League",
-                  over_result AS "Over Result",
-                  under_result AS "Under Result"
-           FROM novig_tracking
-           WHERE league = '{league}'
-           """
+            SELECT {columns}
+            FROM novig_tracking
+            WHERE league = '{league}' AND market_type = '{market_type}'
+        """
 
         df = pd.read_sql(query, self.engine)
 
@@ -84,8 +100,9 @@ class CSV_Bot(commands.Cog):
             await interaction.followup.send(f"No data found for league `{league}`.")
             return
 
-        df["Snapshot"] = df["Snapshot"].dt.tz_localize(None)
-        df["Game Start Time"] = df["Game Start Time"].dt.tz_localize(None)
+        for col in ["Snapshot", "Game Start Time"]:
+            if col in df.columns:
+                df[col] = pd.to_datetime(df[col], errors="coerce").dt.tz_localize(None)
 
         file_path = f"novig_tracking_{league}.xlsx"
         df.to_excel(file_path, index=False)
@@ -94,7 +111,6 @@ class CSV_Bot(commands.Cog):
             f"Excel file for **{league}** is ready:",
             file=discord.File(file_path)
         )
-
 
 load_dotenv()
 intents = discord.Intents.default()

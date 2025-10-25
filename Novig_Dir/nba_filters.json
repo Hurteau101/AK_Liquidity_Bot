@@ -1,39 +1,58 @@
 {
-    "NBA": [
-        {
-        "raw_name": "points",
-        "display_name": "Points",
-        "active": true
-        },
-        {
-        "raw_name": "rebounds",
-        "display_name": "Rebounds",
-        "active": true
-        },
-        {
-        "raw_name": "assists",
-        "display_name": "Assists",
-        "active": true
-        },
-        {
-        "raw_name": "three_pointers_made",
-        "display_name": "3 Pointers Made",
-        "active": true
-        },
-        {
-        "raw_name": "points_rebounds_assists",
-        "display_name": "Points + Rebounds + Assists",
-        "active": true
-        },
-        {
-        "raw_name": "points_rebounds",
-        "display_name": "Points + Rebounds",
-        "active": true
-        },
-        {
-        "raw_name": "points_assists",
-        "display_name": "Points + Assists",
-        "active": true
-        }
-    ]
+    "NBA": {
+        "NBA_Mainlines": [
+            {
+                "raw_name": "spread",
+                "display_name": "Spread",
+                "active": true
+            },
+            {
+                "raw_name": "total",
+                "display_name": "Total",
+                "active": true
+            },
+            {
+                "raw_name": "team_total",
+                "display_name": "Team Total",
+                "active": true
+            }
+        ],
+        "NBA_Props": [
+            {
+                "raw_name": "points",
+                "display_name": "Points",
+                "active": true
+            },
+            {
+                "raw_name": "rebounds",
+                "display_name": "Rebounds",
+                "active": true
+            },
+            {
+                "raw_name": "assists",
+                "display_name": "Assists",
+                "active": true
+            },
+            {
+                "raw_name": "three_pointers_made",
+                "display_name": "3 Pointers Made",
+                "active": true
+            },
+            {
+                "raw_name": "points_rebounds_assists",
+                "display_name": "Points + Rebounds + Assists",
+                "active": true
+            },
+            {
+                "raw_name": "points_rebounds",
+                "display_name": "Points + Rebounds",
+                "active": true
+            },
+            {
+                "raw_name": "points_assists",
+                "display_name": "Points + Assists",
+                "active": true
+            }
+        ]
+    }
 }
