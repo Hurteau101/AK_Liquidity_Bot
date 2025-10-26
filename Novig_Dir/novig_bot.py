@@ -1,5 +1,4 @@
 import json
-
 from novig import Novig
 import asyncio
 
@@ -42,11 +41,8 @@ if __name__ == "__main__":
         nfl_bot_mainlines = NovigSender(filter_data=nfl_mainlines, difference_amount=4000, highest_order=5000)
         nfl_bot_prop = NovigSender(filter_data=nfl_props, difference_amount=4000, highest_order=3000)
 
-        nba_bot_mainlines = NovigSender(filter_data=nba_mainlines, difference_amount=3000, highest_order=5000)
+        nba_bot_mainlines = NovigSender(filter_data=nba_mainlines, difference_amount=1000, highest_order=1000)
         nba_bot_prop = NovigSender(filter_data=nba_props, difference_amount=4000, highest_order=3000)
-
-        # nfl_bot = NovigSender(filter_data=nfl_filters, difference_amount=4000, highest_order=3000)
-        # nba_bot = NovigSender(filter_data=nba_filters, difference_amount=4000, highest_order=3000)
 
         nfl_mainline_data, nfl_prop_data, nba_mainline_data, nba_prop_data = await asyncio.gather(
             nfl_bot_mainlines.runner(),
@@ -66,13 +62,6 @@ if __name__ == "__main__":
 
         nba_prop_manager = ProcessManager(redis_database=4, difference_amount=1000, league="NBA", market_type="props")
         nba_prop_manager.manger(nba_prop_data["NBA"], "NBA")
-
-
-        # nfl_manager = ProcessManager(redis_database=1, difference_amount=1000, league="NFL")
-        # nfl_manager.manger(nfl_data["NFL"], "NFL")
-        #
-        # nba_manager = ProcessManager(redis_database=2, difference_amount=1000, league="NBA")
-        # nba_manager.manger(nba_data["NBA"], "NBA")
 
     asyncio.run(main())
 

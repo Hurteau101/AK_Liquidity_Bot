@@ -110,7 +110,6 @@ class DiscordBot:
 
         # Moneyline / Spread
         if stat_type in ("Moneyline", "Spread"):
-            print(market_data)
             side_1_name, side_2_name = sides[0], sides[1]
             side_1_data = liquidity.get(side_1_name, {}).get("highest_order", {})
             side_2_data = liquidity.get(side_2_name, {}).get("highest_order", {})
