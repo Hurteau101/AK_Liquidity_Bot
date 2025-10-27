@@ -38,6 +38,13 @@ class Database:
                 liquidity_difference NUMERIC,
                 league TEXT,
                 market_type TEXT,
+                spread_team_1_name TEXT,
+                spread_team_2_name TEXT,
+                spread_team_1_total_liquidity NUMERIC,
+                spread_team_2_total_liquidity NUMERIC,
+                spread_team_1_outcome_id TEXT,
+                spread_team_2_outcome_id TEXT
+                
             )
         """)
 
@@ -51,8 +58,23 @@ class Database:
         game_title = additional["game_title"]
         game_start_time = additional["game_start_time"]
         liquidity_difference = record.get("liqudity_difference")
+
         over_data = record["liquidity"].get("over", {}).get("highest_order", {})
         under_data = record["liquidity"].get("under", {}).get("highest_order", {})
+
+        spread_keyword = "Spread"
+
+        # Handle Spreads as they are different
+        if stat_type == spread_keyword:
+            spread_sides = list(record["liquidity"].keys())
+            spread_1 = record["liquidity"].get(spread_sides[0], {}).get("highest_order", {}) if len(
+                spread_sides) > 0 else {}
+            spread_2 = record["liquidity"].get(spread_sides[1], {}).get("highest_order", {}) if len(
+                spread_sides) > 1 else {}
+        else:
+            spread_sides = []
+            spread_1 = {}
+            spread_2 = {}
 
         highest = max(
             record["liquidity"].values(),
@@ -65,23 +87,40 @@ class Database:
             "line": line,
             "game_title": game_title,
             "game_start_time": game_start_time,
-            "total_over_liquidity": over_data.get("total_liquidity", 0),
-            "total_under_liquidity": under_data.get("total_liquidity", 0),
+            "total_over_liquidity": over_data.get("total_liquidity", 0) if stat_type != spread_keyword else None,
+            "total_under_liquidity": under_data.get("total_liquidity", 0) if stat_type != spread_keyword else None,
             "highest_order_side": highest["side"],
             "liquidity_highest_order": highest["liquidity_left"],
             "odds_highest_order": highest["american_price"],
             "liquidity_difference": liquidity_difference,
             "league": league,
-            "over_outcome_id": over_data.get("outcome_id"),
-            "under_outcome_id": under_data.get("outcome_id"),
-            "market_type": market_type
+            "over_outcome_id": over_data.get("outcome_id") if stat_type != spread_keyword else None,
+            "under_outcome_id": under_data.get("outcome_id") if stat_type != spread_keyword else None,
+            "market_type": market_type,
+            "spread_team_1_name": spread_sides[0] if len(spread_sides) > 0 else None,
+            "spread_team_2_name": spread_sides[1] if len(spread_sides) > 1 else None,
+            "spread_team_1_total_liquidity": spread_1.get("total_liquidity"),
+            "spread_team_2_total_liquidity": spread_2.get("total_liquidity"),
+            "spread_team_1_outcome_id": spread_1.get("outcome_id"),
+            "spread_team_2_outcome_id": spread_2.get("outcome_id")
         }
 
-        self.cursor.execute("""
-            SELECT id, liquidity_difference 
-            FROM novig_tracking 
-            WHERE player_name=%s AND stat_type=%s AND line=%s AND game_title=%s AND league=%s
-        """, (player_name, stat_type, line, game_title, league))
+        if market_type != "mainlines":
+            query = ("""
+                SELECT id, liquidity_difference 
+                FROM novig_tracking 
+                WHERE player_name=%s AND stat_type=%s AND line=%s AND game_title=%s AND league=%s
+            """, (player_name, stat_type, line, game_title, league))
+
+        else:
+            query = ("""
+                SELECT id, liquidity_difference 
+                FROM novig_tracking 
+                WHERE stat_type=%s AND line=%s AND game_title=%s AND league=%s
+            """, (stat_type, line, game_title, league))
+
+        self.cursor.execute(*query)
+
 
         existing = self.cursor.fetchone()
 
@@ -98,7 +137,13 @@ class Database:
                         odds_highest_order=%(odds_highest_order)s,
                         liquidity_difference=%(liquidity_difference)s,
                         over_outcome_id=%(over_outcome_id)s,
-                        under_outcome_id=%(under_outcome_id)s
+                        under_outcome_id=%(under_outcome_id)s,
+                        spread_team_1_name=%(spread_team_1_name)s,
+                        spread_team_2_name=%(spread_team_2_name)s,
+                        spread_team_1_total_liquidity=%(spread_team_1_total_liquidity)s,
+                        spread_team_2_total_liquidity=%(spread_team_2_total_liquidity)s,
+                        spread_team_1_outcome_id=%(spread_team_1_outcome_id)s,
+                        spread_team_2_outcome_id=%(spread_team_2_outcome_id)s
                     WHERE id=%(id)s
                 """, {**data, "id": existing_id})
         else:
@@ -106,12 +151,16 @@ class Database:
                 INSERT INTO novig_tracking (
                     player_name, stat_type, line, game_title, game_start_time,
                     total_over_liquidity, total_under_liquidity, highest_order_side, liquidity_highest_order, 
-                    odds_highest_order, liquidity_difference, league, over_outcome_id, under_outcome_id, market_type
+                    odds_highest_order, liquidity_difference, league, over_outcome_id, under_outcome_id, market_type, 
+                    spread_team_1_name, spread_team_2_name, spread_team_1_total_liquidity, spread_team_2_total_liquidity,
+                    spread_team_1_outcome_id, spread_team_2_outcome_id
                 ) VALUES (
                     %(player_name)s, %(stat_type)s, %(line)s, %(game_title)s, %(game_start_time)s,
                     %(total_over_liquidity)s, %(total_under_liquidity)s,
                     %(highest_order_side)s, %(liquidity_highest_order)s, %(odds_highest_order)s, %(liquidity_difference)s, 
-                    %(league)s, %(over_outcome_id)s, %(under_outcome_id)s, %(market_type)s
+                    %(league)s, %(over_outcome_id)s, %(under_outcome_id)s, %(market_type)s, %(spread_team_1_name)s, 
+                    %(spread_team_2_name)s, %(spread_team_1_total_liquidity)s, %(spread_team_2_total_liquidity)s, 
+                    %(spread_team_1_outcome_id)s, %(spread_team_2_outcome_id)s
                 )
             """, data)
 
