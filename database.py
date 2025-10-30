@@ -179,24 +179,55 @@ class Database:
                 SELECT under_outcome_id AS outcome_id
                 FROM novig_tracking
                 WHERE under_result IS NULL AND under_outcome_id IS NOT NULL
+                
+                UNION
+                
+                SELECT spread_team_1_outcome_id AS outcome_id
+                FROM novig_tracking
+                WHERE spread_result IS NULL AND spread_team_1_outcome_id IS NOT NULL
+                
+                UNION
+                
+                SELECT spread_team_2_outcome_id AS outcome_id
+                FROM novig_tracking
+                WHERE spread_result IS NULL AND spread_team_2_outcome_id IS NOT NULL
+                
             ) AS combined
         """)
         return [row[0] for row in self.cursor.fetchall()]
 
     def bulk_update_results(self, results):
-        sql = """
-            UPDATE novig_tracking t
-            SET 
-                over_result  = CASE WHEN t.over_outcome_id  = v.outcome_id THEN v.result ELSE t.over_result END,
-                under_result = CASE WHEN t.under_outcome_id = v.outcome_id THEN v.result ELSE t.under_result END
-            FROM (VALUES %s) AS v(outcome_id, result)
-            WHERE t.over_outcome_id = v.outcome_id
-               OR t.under_outcome_id = v.outcome_id
-        """
+        spread_results = [r for r in results if r[2] == 'SPREAD']
+        normal_results = [r for r in results if r[2] != 'SPREAD']
 
-        execute_values(self.cursor, sql, results)
+
+        if normal_results:
+            sql = """
+                UPDATE novig_tracking t
+                SET
+                    over_result  = CASE WHEN t.over_outcome_id  = v.outcome_id THEN v.result ELSE t.over_result END,
+                    under_result = CASE WHEN t.under_outcome_id = v.outcome_id THEN v.result ELSE t.under_result END
+                FROM (VALUES %s) AS v(outcome_id, result)
+                WHERE t.over_outcome_id = v.outcome_id
+                   OR t.under_outcome_id = v.outcome_id
+            """
+
+            necessary_values = [(r[0], r[1]) for r in normal_results]
+            execute_values(self.cursor, sql, necessary_values)
+
+        if spread_results:
+            spread_win_values = [(r[0], r[3]) for r in spread_results if r[1].upper() == 'WIN']
+
+            if spread_win_values:
+                sql_spread = """
+                    UPDATE novig_tracking t
+                    SET 
+                        spread_result = v.description
+                    FROM (VALUES %s) AS v(outcome_id, description)
+                    WHERE (t.spread_team_1_outcome_id = v.outcome_id OR t.spread_team_2_outcome_id = v.outcome_id)
+                """
+                execute_values(self.cursor, sql_spread, spread_win_values)
         self.conn.commit()
-
 
     def close(self):
         self.cursor.close()

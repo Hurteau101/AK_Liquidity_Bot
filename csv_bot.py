@@ -86,9 +86,12 @@ class CSV_Bot(commands.Cog):
             'market_type AS "Market Type"',
         ]
 
-        # Only include Player Name if NOT mainlines
+        # Only include Player Name if NOT mainlines and Spread Result if mainlines
         if market_type != "mainlines":
             base_columns.insert(1, 'player_name AS "Player Name"')
+        else:
+            base_columns.insert(-1, 'spread_result AS "Spread Result"')
+
 
         columns = ",\n       ".join(base_columns)
 
