@@ -48,7 +48,7 @@ async def _notify_user_async():
     nfl_bot_prop = NovigSender(filter_data=nfl_props, difference_amount=3000, highest_order=2499)
 
     nba_bot_mainlines = NovigSender(filter_data=nba_mainlines, difference_amount=4000, highest_order=5000)
-    nba_bot_prop = NovigSender(filter_data=nba_props, difference_amount=4000, highest_order=3000)
+    nba_bot_prop = NovigSender(filter_data=nba_props, difference_amount=3000, highest_order=2499)
 
     nfl_mainline_data, nfl_prop_data, nba_mainline_data, nba_prop_data = await asyncio.gather(
         nfl_bot_mainlines.runner(),
