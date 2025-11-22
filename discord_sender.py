@@ -158,8 +158,8 @@ class DiscordBot:
                     if stat_type in ("Moneyline", "Spread")
                     else f"{order_data.get('side').title()} {market_data.get('additional_data', {}).get('line')} Link"
                 ),
-                # "value": f"**↠** [Mobile]({order_data.get('mobile_link')}) | [Desktop]({order_data.get('desktop_link')})",
-                "value": f"**↠** [Desktop]({order_data.get('desktop_link')})",
+                "value": f"**↠** [Mobile]({order_data.get('mobile_link')}) | [Desktop]({order_data.get('desktop_link')})",
+                # "value": f"**↠** [Desktop]({order_data.get('desktop_link')})",
                 "inline": False
             }
             for side, data in liquidity.items()
