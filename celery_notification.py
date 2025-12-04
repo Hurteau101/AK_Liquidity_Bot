@@ -44,7 +44,7 @@ async def _notify_user_async():
         nba_mainlines = {"NBA": nba_data.get("NBA", {}).get("NBA_Mainlines")}
         nba_props = {"NBA": nba_data.get("NBA", {}).get("NBA_Props")}
 
-    with open("ncaab_filters.json", "r") as f:
+    with open("Novig_Dir/ncaab_filters.json", "r") as f:
         ncaab_data = json.load(f)
         ncaab_mainlines = {"NCAAB": ncaab_data.get("NCAAB", {}).get("NCAAB_Mainlines")}
 
