@@ -1,0 +1,11 @@
+{
+  "NCAAB": {
+    "NCAAB_Mainlines": [
+      {
+        "raw_name": "total",
+        "display_name": "Total",
+        "active": true
+      }
+    ]
+  }
+}
