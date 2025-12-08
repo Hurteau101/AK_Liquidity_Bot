@@ -48,7 +48,7 @@ async def _notify_user_async():
         ncaab_data = json.load(f)
         ncaab_mainlines = {"NCAAB": ncaab_data.get("NCAAB", {}).get("NCAAB_Mainlines")}
 
-    ncaab_bot_mainlines = NovigSender(filter_data=ncaab_mainlines, difference_amount=4000)
+    ncaab_bot_mainlines = NovigSender(filter_data=ncaab_mainlines, difference_amount=3000)
 
     ncaab_mainline_data, = await asyncio.gather(
         ncaab_bot_mainlines.runner_non_highest(),
