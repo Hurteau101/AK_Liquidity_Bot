@@ -6,7 +6,7 @@ from ProcessManager import ProcessManager
 
 
 class NovigSender:
-    def __init__(self, filter_data, difference_amount, highest_order):
+    def __init__(self, filter_data, difference_amount, highest_order=0):
         self.filters = filter_data
         self.difference_amount = difference_amount
         self.highest_order = highest_order
@@ -23,6 +23,14 @@ class NovigSender:
         novig = Novig(filters=self.filters, filter_amount_dict=total_and_difference_filter)
         return await novig.run()
 
+    async def runner_non_highest(self):
+        total_difference_filter = {
+            "filter_type": "total_difference",
+            "difference_amount": self.difference_amount,
+        }
+
+        novig = Novig(filters=self.filters, filter_amount_dict=total_difference_filter)
+        return await novig.run()
 
 
 if __name__ == "__main__":
@@ -37,6 +45,12 @@ if __name__ == "__main__":
             nba_mainlines = {"NBA": nba_data.get("NBA", {}).get("NBA_Mainlines")}
             nba_props = {"NBA": nba_data.get("NBA", {}).get("NBA_Props")}
 
+        with open("ncaab_filters.json", "r")  as f:
+            ncaab_data = json.load(f)
+            ncaab_mainlines = {"NCAAB": ncaab_data.get("NCAAB", {}).get("NCAAB_Mainlines")}
+
+
+        ncaab_bot_mainlines = NovigSender(filter_data=ncaab_mainlines, difference_amount=4000)
 
         nfl_bot_mainlines = NovigSender(filter_data=nfl_mainlines, difference_amount=4000, highest_order=5000)
         nfl_bot_prop = NovigSender(filter_data=nfl_props, difference_amount=4000, highest_order=3000)
@@ -51,17 +65,24 @@ if __name__ == "__main__":
             nba_bot_prop.runner(),
         )
 
-        nfl_mainline_manager = ProcessManager(redis_database=1, difference_amount=1000, league="NFL", market_type="mainlines")
-        nfl_mainline_manager.manger(nfl_mainline_data["NFL"], "NFL")
+        ncaab_mainline_data, = await asyncio.gather(
+            ncaab_bot_mainlines.runner_non_highest(),
+        )
 
-        nfl_prop_manager = ProcessManager(redis_database=2, difference_amount=1000, league="NFL", market_type="props")
-        nfl_prop_manager.manger(nfl_prop_data["NFL"], "NFL")
+        # nfl_mainline_manager = ProcessManager(redis_database=1, difference_amount=1000, league="NFL", market_type="mainlines")
+        # nfl_mainline_manager.manger(nfl_mainline_data["NFL"], "NFL")
+        #
+        # nfl_prop_manager = ProcessManager(redis_database=2, difference_amount=1000, league="NFL", market_type="props")
+        # nfl_prop_manager.manger(nfl_prop_data["NFL"], "NFL")
+        #
+        # nba_mainline_manager = ProcessManager(redis_database=3, difference_amount=1000, league="NBA",  market_type="mainlines")
+        # nba_mainline_manager.manger(nba_mainline_data["NBA"], "NBA")
+        #
+        # nba_prop_manager = ProcessManager(redis_database=4, difference_amount=1000, league="NBA", market_type="props")
+        # nba_prop_manager.manger(nba_prop_data["NBA"], "NBA")
 
-        nba_mainline_manager = ProcessManager(redis_database=3, difference_amount=1000, league="NBA",  market_type="mainlines")
-        nba_mainline_manager.manger(nba_mainline_data["NBA"], "NBA")
-
-        nba_prop_manager = ProcessManager(redis_database=4, difference_amount=1000, league="NBA", market_type="props")
-        nba_prop_manager.manger(nba_prop_data["NBA"], "NBA")
+        ncaab_mainline_manager = ProcessManager(redis_database=5, difference_amount=1000, league="NCAAB", market_type="mainlines")
+        ncaab_mainline_manager.manger(ncaab_mainline_data["NCAAB"], "NCAAB")
 
     asyncio.run(main())
 

@@ -23,6 +23,7 @@ class DiscordBot:
             "mainlines": {
                 "nfl": os.getenv("DISCORD_WEBHOOK_URL_NFL_MAINLINES"),
                 "nba": os.getenv("DISCORD_WEBHOOK_URL_NBA_MAINLINES"),
+                "ncaab": os.getenv("DISCORD_WEBHOOK_URL_NCAAB_MAINLINES"),
             }
         }
 

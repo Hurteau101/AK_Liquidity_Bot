@@ -44,6 +44,20 @@ async def _notify_user_async():
         nba_mainlines = {"NBA": nba_data.get("NBA", {}).get("NBA_Mainlines")}
         nba_props = {"NBA": nba_data.get("NBA", {}).get("NBA_Props")}
 
+    with open("Novig_Dir/ncaab_filters.json", "r") as f:
+        ncaab_data = json.load(f)
+        ncaab_mainlines = {"NCAAB": ncaab_data.get("NCAAB", {}).get("NCAAB_Mainlines")}
+
+    ncaab_bot_mainlines = NovigSender(filter_data=ncaab_mainlines, difference_amount=3000)
+
+    ncaab_mainline_data, = await asyncio.gather(
+        ncaab_bot_mainlines.runner_non_highest(),
+    )
+
+    ncaab_mainline_manager = ProcessManager(redis_database=5, difference_amount=1000, league="NCAAB",
+                                            market_type="mainlines")
+    ncaab_mainline_manager.manger(ncaab_mainline_data["NCAAB"], "NCAAB")
+
     nfl_bot_mainlines = NovigSender(filter_data=nfl_mainlines, difference_amount=4000, highest_order=5000)
     nfl_bot_prop = NovigSender(filter_data=nfl_props, difference_amount=3000, highest_order=2499)
 
