@@ -65,6 +65,7 @@ if __name__ == "__main__":
             nba_bot_prop.runner(),
         )
 
+
         ncaab_mainline_data, = await asyncio.gather(
             ncaab_bot_mainlines.runner_non_highest(),
         )
