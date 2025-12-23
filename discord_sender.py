@@ -84,9 +84,9 @@ class DiscordBot:
         game_start_utc_str = data.get("additional_data").get("game_start_time")
         if game_start_utc_str:
             game_start_utc = datetime.fromisoformat(game_start_utc_str)
-            eastern = ZoneInfo("America/New_York")
-            game_start_eastern = game_start_utc.astimezone(eastern)
-            game_start_time = game_start_eastern.strftime("%Y-%m-%d")
+            pacific = ZoneInfo("America/Los_Angeles")
+            game_start_pacific = game_start_utc.astimezone(pacific)
+            game_start_time = game_start_pacific.strftime("%Y-%m-%d %I:%M %p")
         else:
             game_start_time = "N/A"
 
