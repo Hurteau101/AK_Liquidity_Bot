@@ -50,6 +50,49 @@ class Database:
 
         self.conn.commit()
 
+    def _update_database(self, data, existing_id):
+        self.cursor.execute("""
+            UPDATE novig_tracking SET
+                game_start_time=%(game_start_time)s,
+                total_over_liquidity=%(total_over_liquidity)s,
+                total_under_liquidity=%(total_under_liquidity)s,
+                highest_order_side=%(highest_order_side)s,
+                liquidity_highest_order=%(liquidity_highest_order)s,
+                odds_highest_order=%(odds_highest_order)s,
+                liquidity_difference=%(liquidity_difference)s,
+                over_outcome_id=%(over_outcome_id)s,
+                under_outcome_id=%(under_outcome_id)s,
+                spread_team_1_name=%(spread_team_1_name)s,
+                spread_team_2_name=%(spread_team_2_name)s,
+                spread_team_1_total_liquidity=%(spread_team_1_total_liquidity)s,
+                spread_team_2_total_liquidity=%(spread_team_2_total_liquidity)s,
+                spread_team_1_outcome_id=%(spread_team_1_outcome_id)s,
+                spread_team_2_outcome_id=%(spread_team_2_outcome_id)s
+            WHERE id=%(id)s
+        """, {**data, "id": existing_id})
+
+        self.conn.commit()
+
+    def _insert_database(self, data):
+        self.cursor.execute("""
+            INSERT INTO novig_tracking (
+                player_name, stat_type, line, game_title, game_start_time,
+                total_over_liquidity, total_under_liquidity, highest_order_side, liquidity_highest_order,
+                odds_highest_order, liquidity_difference, league, over_outcome_id, under_outcome_id, market_type,
+                spread_team_1_name, spread_team_2_name, spread_team_1_total_liquidity, spread_team_2_total_liquidity,
+                spread_team_1_outcome_id, spread_team_2_outcome_id
+            ) VALUES (
+                %(player_name)s, %(stat_type)s, %(line)s, %(game_title)s, %(game_start_time)s,
+                %(total_over_liquidity)s, %(total_under_liquidity)s,
+                %(highest_order_side)s, %(liquidity_highest_order)s, %(odds_highest_order)s, %(liquidity_difference)s,
+                %(league)s, %(over_outcome_id)s, %(under_outcome_id)s, %(market_type)s, %(spread_team_1_name)s,
+                %(spread_team_2_name)s, %(spread_team_1_total_liquidity)s, %(spread_team_2_total_liquidity)s,
+                %(spread_team_1_outcome_id)s, %(spread_team_2_outcome_id)s
+            )
+        """, data)
+
+        self.conn.commit()
+
     def insert_data(self, record, league, market_type):
         additional = record["additional_data"]
         player_name = additional["player_name"]
@@ -114,61 +157,27 @@ class Database:
 
         else:
             query = ("""
-                SELECT id, liquidity_highest_order 
+                SELECT id, liquidity_difference 
                 FROM novig_tracking 
                 WHERE stat_type=%s AND line=%s AND game_title=%s AND league=%s
             """, (stat_type, line, game_title, league))
 
         self.cursor.execute(*query)
-
-
         existing = self.cursor.fetchone()
-        current_highest_liquidity = highest.get("liquidity_left")
 
         if existing:
-            existing_id, existing_highest_order = existing
-            if existing_highest_order:
-                existing_highest_order = float(existing_highest_order)
+            existing_id, existing_order = existing
+            current_order = highest.get("liquidity_left") if market_type != "mainlines" else liquidity_difference
 
-            if current_highest_liquidity and (existing_highest_order is None or current_highest_liquidity > existing_highest_order):
-                self.cursor.execute("""
-                    UPDATE novig_tracking SET
-                        game_start_time=%(game_start_time)s,
-                        total_over_liquidity=%(total_over_liquidity)s,
-                        total_under_liquidity=%(total_under_liquidity)s,
-                        highest_order_side=%(highest_order_side)s,
-                        liquidity_highest_order=%(liquidity_highest_order)s,
-                        odds_highest_order=%(odds_highest_order)s,
-                        liquidity_difference=%(liquidity_difference)s,
-                        over_outcome_id=%(over_outcome_id)s,
-                        under_outcome_id=%(under_outcome_id)s,
-                        spread_team_1_name=%(spread_team_1_name)s,
-                        spread_team_2_name=%(spread_team_2_name)s,
-                        spread_team_1_total_liquidity=%(spread_team_1_total_liquidity)s,
-                        spread_team_2_total_liquidity=%(spread_team_2_total_liquidity)s,
-                        spread_team_1_outcome_id=%(spread_team_1_outcome_id)s,
-                        spread_team_2_outcome_id=%(spread_team_2_outcome_id)s
-                    WHERE id=%(id)s
-                """, {**data, "id": existing_id})
+            if existing_order:
+                existing_order = float(existing_order)
+
+            if current_order and (existing_order is None or current_order > existing_order):
+                self._update_database(data, existing_id)
+
         else:
-            self.cursor.execute("""
-                INSERT INTO novig_tracking (
-                    player_name, stat_type, line, game_title, game_start_time,
-                    total_over_liquidity, total_under_liquidity, highest_order_side, liquidity_highest_order,
-                    odds_highest_order, liquidity_difference, league, over_outcome_id, under_outcome_id, market_type,
-                    spread_team_1_name, spread_team_2_name, spread_team_1_total_liquidity, spread_team_2_total_liquidity,
-                    spread_team_1_outcome_id, spread_team_2_outcome_id
-                ) VALUES (
-                    %(player_name)s, %(stat_type)s, %(line)s, %(game_title)s, %(game_start_time)s,
-                    %(total_over_liquidity)s, %(total_under_liquidity)s,
-                    %(highest_order_side)s, %(liquidity_highest_order)s, %(odds_highest_order)s, %(liquidity_difference)s,
-                    %(league)s, %(over_outcome_id)s, %(under_outcome_id)s, %(market_type)s, %(spread_team_1_name)s,
-                    %(spread_team_2_name)s, %(spread_team_1_total_liquidity)s, %(spread_team_2_total_liquidity)s,
-                    %(spread_team_1_outcome_id)s, %(spread_team_2_outcome_id)s
-                )
-            """, data)
+            self._insert_database(data)
 
-        self.conn.commit()
 
     def get_outcome_ids(self):
         self.cursor.execute("""
