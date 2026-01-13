@@ -107,14 +107,14 @@ class Database:
 
         if market_type != "mainlines":
             query = ("""
-                SELECT id, liquidity_difference 
+                SELECT id, liquidity_highest_order 
                 FROM novig_tracking 
                 WHERE player_name=%s AND stat_type=%s AND line=%s AND game_title=%s AND league=%s
             """, (player_name, stat_type, line, game_title, league))
 
         else:
             query = ("""
-                SELECT id, liquidity_difference 
+                SELECT id, liquidity_highest_order 
                 FROM novig_tracking 
                 WHERE stat_type=%s AND line=%s AND game_title=%s AND league=%s
             """, (stat_type, line, game_title, league))
@@ -123,10 +123,14 @@ class Database:
 
 
         existing = self.cursor.fetchone()
+        current_highest_liquidity = highest.get("liquidity_left")
 
         if existing:
-            existing_id, existing_diff = existing
-            if liquidity_difference and (existing_diff is None or liquidity_difference > existing_diff):
+            existing_id, existing_highest_order = existing
+            if existing_highest_order:
+                existing_highest_order = float(existing_highest_order)
+
+            if current_highest_liquidity and (existing_highest_order is None or current_highest_liquidity > existing_highest_order):
                 self.cursor.execute("""
                     UPDATE novig_tracking SET
                         game_start_time=%(game_start_time)s,
@@ -150,16 +154,16 @@ class Database:
             self.cursor.execute("""
                 INSERT INTO novig_tracking (
                     player_name, stat_type, line, game_title, game_start_time,
-                    total_over_liquidity, total_under_liquidity, highest_order_side, liquidity_highest_order, 
-                    odds_highest_order, liquidity_difference, league, over_outcome_id, under_outcome_id, market_type, 
+                    total_over_liquidity, total_under_liquidity, highest_order_side, liquidity_highest_order,
+                    odds_highest_order, liquidity_difference, league, over_outcome_id, under_outcome_id, market_type,
                     spread_team_1_name, spread_team_2_name, spread_team_1_total_liquidity, spread_team_2_total_liquidity,
                     spread_team_1_outcome_id, spread_team_2_outcome_id
                 ) VALUES (
                     %(player_name)s, %(stat_type)s, %(line)s, %(game_title)s, %(game_start_time)s,
                     %(total_over_liquidity)s, %(total_under_liquidity)s,
-                    %(highest_order_side)s, %(liquidity_highest_order)s, %(odds_highest_order)s, %(liquidity_difference)s, 
-                    %(league)s, %(over_outcome_id)s, %(under_outcome_id)s, %(market_type)s, %(spread_team_1_name)s, 
-                    %(spread_team_2_name)s, %(spread_team_1_total_liquidity)s, %(spread_team_2_total_liquidity)s, 
+                    %(highest_order_side)s, %(liquidity_highest_order)s, %(odds_highest_order)s, %(liquidity_difference)s,
+                    %(league)s, %(over_outcome_id)s, %(under_outcome_id)s, %(market_type)s, %(spread_team_1_name)s,
+                    %(spread_team_2_name)s, %(spread_team_1_total_liquidity)s, %(spread_team_2_total_liquidity)s,
                     %(spread_team_1_outcome_id)s, %(spread_team_2_outcome_id)s
                 )
             """, data)

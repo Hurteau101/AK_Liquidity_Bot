@@ -4,7 +4,7 @@
       {
         "raw_name": "spread",
         "display_name": "Spread",
-        "active": true
+        "active": false
       },
       {
         "raw_name": "total",
