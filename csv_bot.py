@@ -109,7 +109,7 @@ class CSV_Bot(commands.Cog):
 
         for col in ["Snapshot", "Game Start Time"]:
             if col in df.columns:
-                df[col] = pd.to_datetime(df[col], errors="coerce").dt.tz_localize(None)
+                df[col] = pd.to_datetime(df[col], errors="coerce").dt.tz_localize('America/Los_Angeles')
 
         file_path = f"novig_tracking_{league}.xlsx"
         df.to_excel(file_path, index=False)
