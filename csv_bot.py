@@ -109,7 +109,15 @@ class CSV_Bot(commands.Cog):
 
         for col in ["Snapshot", "Game Start Time"]:
             if col in df.columns:
-                df[col] = pd.to_datetime(df[col], errors="coerce").dt.tz_localize('America/Los_Angeles')
+                df[col] = pd.to_datetime(df[col], errors="coerce")
+
+                if df[col].dt.tz is not None:
+                    df[col] = df[col].dt.tz_convert("America/Los_Angeles")
+                else:
+                    df[col] = df[col].dt.tz_localize("UTC").dt.tz_convert("America/Los_Angeles")
+
+                df[col] = df[col].dt.tz_localize(None)
+
 
         file_path = f"novig_tracking_{league}.xlsx"
         df.to_excel(file_path, index=False)
@@ -127,11 +135,11 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 @bot.event
 async def on_ready():
     try:
-        await bot.tree.sync()  # ✅ This is what registers /csv
-        print("✅ Slash commands synced with Discord!")
+        await bot.tree.sync()
+        print("Slash commands synced with Discord!")
     except Exception as e:
-        print(f"❌ Failed to sync commands: {e}")
-    print(f"🤖 Logged in as {bot.user}")
+        print(f"Failed to sync commands: {e}")
+    print(f"Logged in as {bot.user}")
 
 
 async def setup_bot():
