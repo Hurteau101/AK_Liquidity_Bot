@@ -54,10 +54,7 @@ class ProcessManager:
         pipeline.execute()
 
 
-    def strategy_runner(self, player_data: dict, player_key: str, start_time_dt: datetime):
-        redis_instance = redis.Redis(host="localhost", port=6379, db=2, decode_responses=True)
-        pipeline = redis_instance.pipeline()
-
+    def strategy_runner(self, player_data: dict, player_key: str, start_time_dt: datetime, redis_instance: redis.Redis, pipeline):
         player_liq_data = self.strategy_storer(player_data=player_data, player_key=player_key, start_time_dt=start_time_dt, redis_instance=redis_instance, pipeline=pipeline)
         self.strategy_checker(
             player_data=player_liq_data,
@@ -149,6 +146,9 @@ class ProcessManager:
         if not player_data or not league:
             return
 
+        redis_strategy_instance = redis.Redis(host="localhost", port=6379, db=2, decode_responses=True)
+        pipeline_strategy = redis_strategy_instance.pipeline()
+
         pipeline = self.redis_client.pipeline()
         db = Database()
 
@@ -181,8 +181,11 @@ class ProcessManager:
 
             if league == "NBA" and self.market_type == "mainlines" and player.get("additional_data", {}).get(
                     "stat_type") == "Spread":
+
                 self.strategy_runner(
                     player_data=player,
                     player_key=player_key,
                     start_time_dt=start_date_dt,
+                    redis_instance=redis_strategy_instance,
+                    pipeline=pipeline_strategy
                 )
