@@ -54,18 +54,23 @@ class ProcessManager:
         pipeline.execute()
 
 
-    def strategy_runner(self, player_data: dict, player_key: str, start_time_dt: datetime, redis_instance: redis.Redis, pipeline):
+    def strategy_runner(self, player_data: dict, player_key: str, start_time_dt: datetime, redis_instance: redis.Redis, pipeline, sent_strategy_instance: redis.Redis):
         player_liq_data = self.strategy_storer(player_data=player_data, player_key=player_key, start_time_dt=start_time_dt, redis_instance=redis_instance, pipeline=pipeline)
         self.strategy_checker(
             player_data=player_liq_data,
             start_date=start_time_dt,
+            already_sent_redis=sent_strategy_instance,
+            player_key=player_key
         )
 
 
-    def strategy_checker(self, player_data: dict, start_date: datetime):
+    def strategy_checker(self, player_data: dict, start_date: datetime, already_sent_redis: redis.Redis, player_key: str):
         modified_date = start_date - timedelta(minutes=9)
         now_utc = datetime.now(timezone.utc)
-        if now_utc >= modified_date:
+
+        already_sent = already_sent_redis.exists(player_key)
+
+        if not already_sent and now_utc >= modified_date:
             highest_order = max(
                 player_data.get("liquidity").values(),
                 key=lambda x: x["highest_order"]["total_liquidity"]
@@ -104,6 +109,8 @@ class ProcessManager:
                 strategy = "Volume"
 
             if strategy:
+                already_sent_redis.set(name=player_key, ex=int(start_date.timestamp() * 1000), value="")
+
                 strategy_bot.discord_message(
                     highest_order=highest_order,
                     market_data=player_data,
@@ -146,8 +153,10 @@ class ProcessManager:
         if not player_data or not league:
             return
 
-        redis_strategy_instance = redis.Redis(host="localhost", port=6379, db=2, decode_responses=True)
+        redis_strategy_instance = redis.Redis(host="localhost", port=6379, db=8, decode_responses=True)
         pipeline_strategy = redis_strategy_instance.pipeline()
+
+        redis_strategy_sent_instance = redis.Redis(host="localhost", port=6379, db=9, decode_responses=True)
 
         pipeline = self.redis_client.pipeline()
         db = Database()
@@ -187,5 +196,6 @@ class ProcessManager:
                     player_key=player_key,
                     start_time_dt=start_date_dt,
                     redis_instance=redis_strategy_instance,
-                    pipeline=pipeline_strategy
+                    pipeline=pipeline_strategy,
+                    sent_strategy_instance=redis_strategy_sent_instance,
                 )
