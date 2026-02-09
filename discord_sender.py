@@ -76,19 +76,26 @@ class DiscordBot:
 
         return bet_info
 
+    @staticmethod
+    def get_time_pacific(game_start: str):
+        """Convert to Pacific Time"""
+        if game_start:
+            game_start_utc = datetime.fromisoformat(game_start)
+            pacific = ZoneInfo("America/Los_Angeles")
+            game_start_pacific = game_start_utc.astimezone(pacific)
+            game_start_time = game_start_pacific.strftime("%Y-%m-%d %I:%M %p")
+        else:
+            game_start_time = "N/A"
+
+        return game_start_time
+
 
     def discord_message(self, data, market_changed=False):
         stat_type = data.get("additional_data").get("stat_type")
         line = data.get("additional_data").get("line")
 
         game_start_utc_str = data.get("additional_data").get("game_start_time")
-        if game_start_utc_str:
-            game_start_utc = datetime.fromisoformat(game_start_utc_str)
-            pacific = ZoneInfo("America/Los_Angeles")
-            game_start_pacific = game_start_utc.astimezone(pacific)
-            game_start_time = game_start_pacific.strftime("%Y-%m-%d %I:%M %p")
-        else:
-            game_start_time = "N/A"
+        game_start_time = self.get_time_pacific(game_start=game_start_utc_str)
 
         if data.get("additional_data", {}).get("type") == "player":
             main_title = self.player_message(data, stat_type, line)
