@@ -86,8 +86,8 @@ if __name__ == "__main__":
                                               market_type="mainlines")
         nba_mainline_manager.manger(nba_mainline_data["NBA"], "NBA")
 
-        nba_prop_manager = ProcessManager(redis_database=4, difference_amount=1000, league="NBA", market_type="props")
-        nba_prop_manager.manger(nba_prop_data["NBA"], "NBA")
+        # nba_prop_manager = ProcessManager(redis_database=4, difference_amount=1000, league="NBA", market_type="props")
+        # nba_prop_manager.manger(nba_prop_data["NBA"], "NBA")
 
 
     asyncio.run(main())

@@ -54,70 +54,73 @@ class ProcessManager:
         pipeline.execute()
 
 
-    def strategy_runner(self, player_data: dict, player_key: str, start_time_dt: datetime, redis_instance: redis.Redis, pipeline, sent_strategy_instance: redis.Redis):
-        player_liq_data = self.strategy_storer(player_data=player_data, player_key=player_key, start_time_dt=start_time_dt, redis_instance=redis_instance, pipeline=pipeline)
-        self.strategy_checker(
-            player_data=player_liq_data,
-            start_date=start_time_dt,
-            already_sent_redis=sent_strategy_instance,
-            player_key=player_key
-        )
+    def strategy_checker(self, strategy_redis: redis.Redis, already_sent_redis: redis.Redis):
+        all_data = strategy_redis.keys("*")
 
+        stored_values = {
+            key: json.loads(player_data)
+            for key in all_data
+            if key
+            for player_data in strategy_redis.hgetall(key).values()
+        }
 
-    def strategy_checker(self, player_data: dict, start_date: datetime, already_sent_redis: redis.Redis, player_key: str):
-        modified_date = start_date - timedelta(minutes=9)
-        now_utc = datetime.now(timezone.utc)
+        for key, value in stored_values.items():
+            start_date = value.get("additional_data", {}).get("game_start_time")
+            start_date_dt = datetime.fromisoformat(start_date.replace("Z", "+00:00"))
 
-        already_sent = already_sent_redis.exists(player_key)
+            modified_date = start_date_dt - timedelta(minutes=9)
+            now_utc = datetime.now(timezone.utc)
 
-        if not already_sent and now_utc >= modified_date:
-            highest_order = max(
-                player_data.get("liquidity").values(),
-                key=lambda x: x["highest_order"]["total_liquidity"]
-            )["highest_order"]
+            already_sent = already_sent_redis.exists(key)
 
-            liquidity_difference = player_data.get("liqudity_difference")
+            if not already_sent and now_utc >= modified_date:
+                highest_order = max(
+                    value.get("liquidity").values(),
+                    key=lambda x: x["highest_order"]["total_liquidity"]
+                )["highest_order"]
 
-            strategy_bot = StrategyDiscordBot()
-            strategy = None
+                liquidity_difference = value.get("liqudity_difference")
 
-            if all([
-                highest_order["cost_avg_odds"] > 0,
-                SpreadSniper.LOW_ODDS.value <= highest_order.get("cost_avg_odds",
-                                                                 0) <= SpreadSniper.HIGH_ODDS.value,
-                SpreadSniper.LOW_HIGHEST_ORDER.value <= highest_order.get("liquidity_left",
-                                                                          0) <= SpreadSniper.HIGH_HIGHEST_ORDER.value,
-                SpreadSniper.LOW_LIQ_DIFFERENCE.value <= liquidity_difference <= SpreadSniper.HIGH_LIQ_DIFFERENCE.value,
-            ]):
-                strategy = "Sniper"
+                strategy_bot = StrategyDiscordBot()
+                strategy = None
 
-            elif all([
-                SpreadExecutive.LOW_ODDS.value <= highest_order.get("cost_avg_odds",
-                                                                    0) <= SpreadExecutive.HIGH_ODDS.value,
-                SpreadExecutive.LOW_HIGHEST_ORDER.value <= highest_order.get("liquidity_left",
-                                                                             0) <= SpreadExecutive.HIGH_HIGHEST_ORDER.value,
-                SpreadExecutive.LOW_LIQ_DIFFERENCE.value <= liquidity_difference <= SpreadExecutive.HIGH_LIQ_DIFFERENCE.value,
-            ]):
-                strategy = "Executive"
+                if all([
+                    highest_order["cost_avg_odds"] > 0,
+                    SpreadSniper.LOW_ODDS.value <= highest_order.get("cost_avg_odds",
+                                                                     0) <= SpreadSniper.HIGH_ODDS.value,
+                    SpreadSniper.LOW_HIGHEST_ORDER.value <= highest_order.get("liquidity_left",
+                                                                              0) <= SpreadSniper.HIGH_HIGHEST_ORDER.value,
+                    SpreadSniper.LOW_LIQ_DIFFERENCE.value <= liquidity_difference <= SpreadSniper.HIGH_LIQ_DIFFERENCE.value,
+                ]):
+                    strategy = "Sniper"
 
-            elif all([
-                SpreadVolume.LOW_ODDS.value <= highest_order.get("cost_avg_odds",
-                                                                 0) <= SpreadVolume.HIGH_ODDS.value,
-                SpreadVolume.LOW_HIGHEST_ORDER.value <= highest_order.get("liquidity_left",
-                                                                          0) <= SpreadVolume.HIGH_HIGHEST_ORDER.value
-            ]):
-                strategy = "Volume"
+                elif all([
+                    SpreadExecutive.LOW_ODDS.value <= highest_order.get("cost_avg_odds",
+                                                                        0) <= SpreadExecutive.HIGH_ODDS.value,
+                    SpreadExecutive.LOW_HIGHEST_ORDER.value <= highest_order.get("liquidity_left",
+                                                                                 0) <= SpreadExecutive.HIGH_HIGHEST_ORDER.value,
+                    SpreadExecutive.LOW_LIQ_DIFFERENCE.value <= liquidity_difference <= SpreadExecutive.HIGH_LIQ_DIFFERENCE.value,
+                ]):
+                    strategy = "Executive"
 
-            if strategy:
-                already_sent_redis.set(name=player_key, ex=int(start_date.timestamp() * 1000), value="")
+                elif all([
+                    SpreadVolume.LOW_ODDS.value <= highest_order.get("cost_avg_odds",
+                                                                     0) <= SpreadVolume.HIGH_ODDS.value,
+                    SpreadVolume.LOW_HIGHEST_ORDER.value <= highest_order.get("liquidity_left",
+                                                                              0) <= SpreadVolume.HIGH_HIGHEST_ORDER.value
+                ]):
+                    strategy = "Volume"
 
-                strategy_bot.discord_message(
-                    highest_order=highest_order,
-                    market_data=player_data,
-                    strategy_type=strategy,
-                    stat_type="Spread",
-                    liquidity_difference=liquidity_difference
-                )
+                if strategy:
+                    already_sent_redis.set(name=key, ex=int(start_date_dt.timestamp() * 1000), value="")
+
+                    strategy_bot.discord_message(
+                        highest_order=highest_order,
+                        market_data=value,
+                        strategy_type=strategy,
+                        stat_type="Spread",
+                        liquidity_difference=liquidity_difference
+                    )
 
     def strategy_storer(self, player_data: dict, player_key: str, start_time_dt: datetime, redis_instance: redis.Redis, pipeline):
         found_player = redis_instance.exists(player_key)
@@ -130,6 +133,7 @@ class ProcessManager:
             previous_data = redis_instance.hget(player_key, "player_data")
             previous_player_dict = json.loads(previous_data)
 
+
             previous_highest_order = max(
                 previous_player_dict.get("liquidity").values(),
                 key=lambda x: x["highest_order"]["total_liquidity"]
@@ -141,12 +145,12 @@ class ProcessManager:
             )["highest_order"]
 
             if current_highest_order.get("liquidity_left") <= previous_highest_order.get("liquidity_left"):
-                return previous_player_dict # Return previous player since its the highest still.
+                return
 
         self.store_player(pipeline=pipeline, player_key=player_key, start_time_dt=start_time_dt,
                           mapping_data=mapping_data)
 
-        return player_data # Return new data as its the highest.
+
 
 
     def manger(self, player_data, league):
@@ -154,8 +158,7 @@ class ProcessManager:
             return
 
         redis_strategy_instance = redis.Redis(host="localhost", port=6379, db=8, decode_responses=True)
-        pipeline_strategy = redis_strategy_instance.pipeline()
-
+        strategy_pipeline = redis_strategy_instance.pipeline()
         redis_strategy_sent_instance = redis.Redis(host="localhost", port=6379, db=9, decode_responses=True)
 
         pipeline = self.redis_client.pipeline()
@@ -191,11 +194,19 @@ class ProcessManager:
             if league == "NBA" and self.market_type == "mainlines" and player.get("additional_data", {}).get(
                     "stat_type") == "Spread":
 
-                self.strategy_runner(
-                    player_data=player,
-                    player_key=player_key,
-                    start_time_dt=start_date_dt,
-                    redis_instance=redis_strategy_instance,
-                    pipeline=pipeline_strategy,
-                    sent_strategy_instance=redis_strategy_sent_instance,
-                )
+                self.strategy_storer(player_data=player, player_key=player_key, start_time_dt=start_date_dt,
+                                     redis_instance=redis_strategy_instance, pipeline=strategy_pipeline)
+
+        if league == "NBA" and self.market_type == "mainlines":
+            self.strategy_checker(already_sent_redis=redis_strategy_sent_instance, strategy_redis=redis_strategy_instance)
+
+
+        # self.strategy_runner(
+        #     player_data=player,
+        #     player_key=player_key,
+        #     start_time_dt=start_date_dt,
+        #     redis_instance=redis_strategy_instance,
+        #     pipeline=pipeline_strategy,
+        #     sent_strategy_instance=redis_strategy_sent_instance,
+        # )
+
