@@ -122,15 +122,16 @@ class ProcessManager:
                         liquidity_difference=liquidity_difference
                     )
 
-    def strategy_storer(self, player_data: dict, player_key: str, start_time_dt: datetime, redis_instance: redis.Redis, pipeline):
-        found_player = redis_instance.exists(player_key)
+    def strategy_storer(self, player_data: dict, start_time_dt: datetime, redis_instance: redis.Redis, pipeline):
+        game_key = player_data.get("additional_data", {}).get("game_title")
+        found_player = redis_instance.exists(game_key)
 
         mapping_data = {
             "player_data": json.dumps(player_data),
         }
 
         if found_player:
-            previous_data = redis_instance.hget(player_key, "player_data")
+            previous_data = redis_instance.hget(game_key, "player_data")
             previous_player_dict = json.loads(previous_data)
 
 
@@ -147,11 +148,8 @@ class ProcessManager:
             if current_highest_order.get("liquidity_left") <= previous_highest_order.get("liquidity_left"):
                 return
 
-        self.store_player(pipeline=pipeline, player_key=player_key, start_time_dt=start_time_dt,
+        self.store_player(pipeline=pipeline, player_key=game_key, start_time_dt=start_time_dt,
                           mapping_data=mapping_data)
-
-
-
 
     def manger(self, player_data, league):
         if not player_data or not league:
@@ -193,20 +191,9 @@ class ProcessManager:
 
             if league == "NBA" and self.market_type == "mainlines" and player.get("additional_data", {}).get(
                     "stat_type") == "Spread":
-
-                self.strategy_storer(player_data=player, player_key=player_key, start_time_dt=start_date_dt,
+                self.strategy_storer(player_data=player, start_time_dt=start_date_dt,
                                      redis_instance=redis_strategy_instance, pipeline=strategy_pipeline)
 
         if league == "NBA" and self.market_type == "mainlines":
             self.strategy_checker(already_sent_redis=redis_strategy_sent_instance, strategy_redis=redis_strategy_instance)
-
-
-        # self.strategy_runner(
-        #     player_data=player,
-        #     player_key=player_key,
-        #     start_time_dt=start_date_dt,
-        #     redis_instance=redis_strategy_instance,
-        #     pipeline=pipeline_strategy,
-        #     sent_strategy_instance=redis_strategy_sent_instance,
-        # )
 
