@@ -74,6 +74,7 @@ class ProcessManager:
             already_sent = already_sent_redis.exists(key)
 
             if not already_sent and now_utc >= modified_date:
+                print("Potential Strategy Match")
                 highest_order = max(
                     value.get("liquidity").values(),
                     key=lambda x: x["highest_order"]["total_liquidity"]
@@ -112,6 +113,7 @@ class ProcessManager:
                     strategy = "Volume"
 
                 if strategy:
+                    print(f"Strategy Match: {strategy}")
                     already_sent_redis.set(name=key, ex=int(start_date_dt.timestamp() * 1000), value="")
 
                     strategy_bot.discord_message(
@@ -121,7 +123,8 @@ class ProcessManager:
                         stat_type="Spread",
                         liquidity_difference=liquidity_difference
                     )
-
+                else:
+                    print("No Strategy Match")
     def strategy_storer(self, player_data: dict, start_time_dt: datetime, redis_instance: redis.Redis, pipeline):
         game_key = player_data.get("additional_data", {}).get("game_title")
         found_player = redis_instance.exists(game_key)
@@ -151,6 +154,12 @@ class ProcessManager:
         self.store_player(pipeline=pipeline, player_key=game_key, start_time_dt=start_time_dt,
                           mapping_data=mapping_data)
 
+    def check_strategy(self, league, player, start_date_dt, redis_strategy_instance, strategy_pipeline):
+        if league == "NBA" and self.market_type == "mainlines" and player.get("additional_data", {}).get(
+                "stat_type") == "Spread":
+            self.strategy_storer(player_data=player, start_time_dt=start_date_dt,
+                                 redis_instance=redis_strategy_instance, pipeline=strategy_pipeline)
+
     def manger(self, player_data, league):
         if not player_data or not league:
             return
@@ -178,6 +187,7 @@ class ProcessManager:
 
             if redis_current_diff is None:
                 # New player
+                self.check_strategy(league=league, player=player, start_date_dt=start_date_dt, redis_strategy_instance=redis_strategy_instance, strategy_pipeline=strategy_pipeline)
                 self.store_player(pipeline=pipeline, player_key=player_key, mapping_data=mapping_data,start_time_dt=start_date_dt_plus_buffer)
                 self.discord_bot.discord_message(player, market_changed=False)
                 db.insert_data(player, league, self.market_type)
@@ -185,14 +195,11 @@ class ProcessManager:
 
             elif abs(float(redis_current_diff) - player_liquidity_difference) >= self.difference_amount:
                 # Existing player but difference changed a lot
+                self.check_strategy(league=league, player=player, start_date_dt=start_date_dt, redis_strategy_instance=redis_strategy_instance, strategy_pipeline=strategy_pipeline)
                 self.store_player(pipeline=pipeline, player_key=player_key, mapping_data=mapping_data, start_time_dt=start_date_dt)
                 self.discord_bot.discord_message(player, market_changed=True)
                 db.insert_data(player, league, self.market_type)
 
-            if league == "NBA" and self.market_type == "mainlines" and player.get("additional_data", {}).get(
-                    "stat_type") == "Spread":
-                self.strategy_storer(player_data=player, start_time_dt=start_date_dt,
-                                     redis_instance=redis_strategy_instance, pipeline=strategy_pipeline)
 
         if league == "NBA" and self.market_type == "mainlines":
             self.strategy_checker(already_sent_redis=redis_strategy_sent_instance, strategy_redis=redis_strategy_instance)
