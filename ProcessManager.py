@@ -86,7 +86,7 @@ class ProcessManager:
                 strategy = None
 
                 if all([
-                    highest_order["cost_avg_odds"] > 0,
+                    "-" in highest_order.get("side", ""),
                     SpreadSniper.LOW_ODDS.value <= highest_order.get("cost_avg_odds",
                                                                      0) <= SpreadSniper.HIGH_ODDS.value,
                     SpreadSniper.LOW_HIGHEST_ORDER.value <= highest_order.get("liquidity_left",
@@ -185,20 +185,20 @@ class ProcessManager:
 
             mapping_data = {"liquidity_difference": player_liquidity_difference}
 
-            if redis_current_diff is None:
-                # New player
-                self.check_strategy(league=league, player=player, start_date_dt=start_date_dt, redis_strategy_instance=redis_strategy_instance, strategy_pipeline=strategy_pipeline)
-                self.store_player(pipeline=pipeline, player_key=player_key, mapping_data=mapping_data,start_time_dt=start_date_dt_plus_buffer)
-                self.discord_bot.discord_message(player, market_changed=False)
-                db.insert_data(player, league, self.market_type)
-
-
-            elif abs(float(redis_current_diff) - player_liquidity_difference) >= self.difference_amount:
-                # Existing player but difference changed a lot
-                self.check_strategy(league=league, player=player, start_date_dt=start_date_dt, redis_strategy_instance=redis_strategy_instance, strategy_pipeline=strategy_pipeline)
-                self.store_player(pipeline=pipeline, player_key=player_key, mapping_data=mapping_data, start_time_dt=start_date_dt)
-                self.discord_bot.discord_message(player, market_changed=True)
-                db.insert_data(player, league, self.market_type)
+            # if redis_current_diff is None:
+            #     # New player
+            #     self.check_strategy(league=league, player=player, start_date_dt=start_date_dt, redis_strategy_instance=redis_strategy_instance, strategy_pipeline=strategy_pipeline)
+            #     self.store_player(pipeline=pipeline, player_key=player_key, mapping_data=mapping_data,start_time_dt=start_date_dt_plus_buffer)
+            #     self.discord_bot.discord_message(player, market_changed=False)
+            #     db.insert_data(player, league, self.market_type)
+            #
+            #
+            # elif abs(float(redis_current_diff) - player_liquidity_difference) >= self.difference_amount:
+            #     # Existing player but difference changed a lot
+            #     self.check_strategy(league=league, player=player, start_date_dt=start_date_dt, redis_strategy_instance=redis_strategy_instance, strategy_pipeline=strategy_pipeline)
+            #     self.store_player(pipeline=pipeline, player_key=player_key, mapping_data=mapping_data, start_time_dt=start_date_dt)
+            #     self.discord_bot.discord_message(player, market_changed=True)
+            #     db.insert_data(player, league, self.market_type)
 
 
         if league == "NBA" and self.market_type == "mainlines":
