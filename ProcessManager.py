@@ -76,8 +76,7 @@ class ProcessManager:
 
             already_sent = already_sent_redis.exists(key)
 
-            # if not already_sent and now_utc >= modified_date:
-            if not already_sent:
+            if not already_sent and now_utc >= modified_date:
                 matches = db.get_games(
                     game_title=key,
                     game_start_time=start_date_dt,

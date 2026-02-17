@@ -6,6 +6,8 @@ import psycopg2
 from dotenv import load_dotenv
 
 
+#### ADD CONNECTION POOLING SINCE CURRENT SETUP COULD HAVE LEAKS.
+
 class Database:
     def __init__(self):
         load_dotenv()
