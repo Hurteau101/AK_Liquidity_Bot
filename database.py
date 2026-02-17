@@ -1,4 +1,6 @@
 import os
+from datetime import datetime
+from psycopg2.extras import RealDictCursor
 from psycopg2.extras import execute_values
 import psycopg2
 from dotenv import load_dotenv
@@ -49,6 +51,26 @@ class Database:
         """)
 
         self.conn.commit()
+
+    def get_games(self, game_title: str, game_start_time: datetime, league: str, stat_type: str):
+
+        query = """
+                SELECT *
+                FROM novig_tracking
+                WHERE game_start_time = %s
+                  AND game_title = %s
+                  AND league = %s
+                  AND stat_type = %s \
+                """
+
+        self.cursor.execute(query, (game_start_time, game_title, league, stat_type))
+        rows = self.cursor.fetchall()
+
+        columns = [desc[0] for desc in self.cursor.description]
+
+        result = [dict(zip(columns, row)) for row in rows]
+
+        return result
 
     def _update_database(self, data, existing_id):
         self.cursor.execute("""
