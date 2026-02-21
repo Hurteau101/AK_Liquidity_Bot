@@ -47,8 +47,9 @@ def strategy_checker():
         start_date = value.get("additional_data", {}).get("game_start_time")
         start_date_dt = datetime.fromisoformat(start_date.replace("Z", "+00:00"))
 
-        modified_date = start_date_dt - datetime.timedelta(minutes=9)
-        now_utc = datetime.now(datetime.timezone.utc)
+        modified_date = start_date_dt - timedelta(minutes=9)
+        now_utc = datetime.now(timezone.utc)
+
 
         already_sent = redis_strategy_sent_instance.exists(key)
 
