@@ -113,5 +113,3 @@ def strategy_checker():
             else:
                 print("No Strategy Match")
 
-
-strategy_checker()
