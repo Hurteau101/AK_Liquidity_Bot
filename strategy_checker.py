@@ -8,11 +8,11 @@ from strategy_bot_sender import StrategyDiscordBot
 
 class SpreadSniper(Enum):
     LOW_ODDS = -110
-    HIGH_ODDS = 1100
+    HIGH_ODDS = 110
     LOW_HIGHEST_ORDER = 5250
-    HIGH_HIGHEST_ORDER = 74000
+    HIGH_HIGHEST_ORDER = 7400
     LOW_LIQ_DIFFERENCE = 4100
-    HIGH_LIQ_DIFFERENCE = 83500
+    HIGH_LIQ_DIFFERENCE = 8350
 
 class SpreadExecutive(Enum):
     LOW_ODDS = -110
@@ -81,7 +81,7 @@ def strategy_checker():
             strategy = None
 
             if all([
-                # is_favorite,
+                is_favorite,
                 SpreadSniper.LOW_ODDS.value <= odds <= SpreadSniper.HIGH_ODDS.value,
                 SpreadSniper.LOW_HIGHEST_ORDER.value <= liquidity_highest_order <= SpreadSniper.HIGH_HIGHEST_ORDER.value,
                 SpreadSniper.LOW_LIQ_DIFFERENCE.value <= liquidity_difference <= SpreadSniper.HIGH_LIQ_DIFFERENCE.value,
