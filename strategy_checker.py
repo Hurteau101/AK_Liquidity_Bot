@@ -8,11 +8,11 @@ from strategy_bot_sender import StrategyDiscordBot
 
 class SpreadSniper(Enum):
     LOW_ODDS = -110
-    HIGH_ODDS = 110
+    HIGH_ODDS = 1100
     LOW_HIGHEST_ORDER = 5250
-    HIGH_HIGHEST_ORDER = 7400
+    HIGH_HIGHEST_ORDER = 74000
     LOW_LIQ_DIFFERENCE = 4100
-    HIGH_LIQ_DIFFERENCE = 8350
+    HIGH_LIQ_DIFFERENCE = 83500
 
 class SpreadExecutive(Enum):
     LOW_ODDS = -110
@@ -55,7 +55,7 @@ def strategy_checker():
 
         if not already_sent and now_utc >= modified_date:
             matches = db.get_games(
-                game_title="Miami Heat @ Atlanta Hawks",
+                game_title=key,
                 game_start_time=start_date_dt,
                 league=value.get("league"),
                 stat_type=value.get("additional_data", {}).get("stat_type")
@@ -69,6 +69,7 @@ def strategy_checker():
                 key=lambda x: x["liquidity_highest_order"]
             )
 
+
             liquidity_difference = float(highest_order.get("liquidity_difference", 0))
             odds = float(highest_order.get("odds_highest_order", 0))
             liquidity_highest_order = float(highest_order.get("liquidity_highest_order", 0))
@@ -80,7 +81,7 @@ def strategy_checker():
             strategy = None
 
             if all([
-                is_favorite,
+                # is_favorite,
                 SpreadSniper.LOW_ODDS.value <= odds <= SpreadSniper.HIGH_ODDS.value,
                 SpreadSniper.LOW_HIGHEST_ORDER.value <= liquidity_highest_order <= SpreadSniper.HIGH_HIGHEST_ORDER.value,
                 SpreadSniper.LOW_LIQ_DIFFERENCE.value <= liquidity_difference <= SpreadSniper.HIGH_LIQ_DIFFERENCE.value,
@@ -105,11 +106,9 @@ def strategy_checker():
                 redis_strategy_sent_instance.set(name=key, ex=int(start_date_dt.timestamp() * 1000), value="")
 
                 strategy_bot.discord_message(
-                    highest_order=highest_order,
-                    market_data=value,
+                    order_details=highest_order,
                     strategy_type=strategy,
-                    stat_type="Spread",
-                    liquidity_difference=liquidity_difference
+                    game_time=start_date
                 )
             else:
                 print("No Strategy Match")
