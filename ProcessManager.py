@@ -56,87 +56,87 @@ class ProcessManager:
         pipeline.execute()
 
 
-    def strategy_checker(self, strategy_redis: redis.Redis, already_sent_redis: redis.Redis, db:Database):
-        all_data = strategy_redis.keys("*")
-
-        stored_values = {
-            key: json.loads(player_data)
-            for key in all_data
-            if key
-            for player_data in strategy_redis.hgetall(key).values()
-        }
-
-
-        for key, value in stored_values.items():
-            start_date = value.get("additional_data", {}).get("game_start_time")
-            start_date_dt = datetime.fromisoformat(start_date.replace("Z", "+00:00"))
-
-            modified_date = start_date_dt - timedelta(minutes=9)
-            now_utc = datetime.now(timezone.utc)
-
-            already_sent = already_sent_redis.exists(key)
-
-            if not already_sent and now_utc >= modified_date:
-                matches = db.get_games(
-                    game_title=key,
-                    game_start_time=start_date_dt,
-                    league=value.get("league"),
-                    stat_type=value.get("additional_data", {}).get("stat_type")
-                )
-
-                if not matches:
-                    return
-
-                highest_order = max(
-                    matches,
-                    key=lambda x: x["liquidity_highest_order"]
-                )
-
-                liquidity_difference = float(highest_order.get("liquidity_difference", 0))
-                odds = float(highest_order.get("odds_highest_order", 0))
-                liquidity_highest_order = float(highest_order.get("liquidity_highest_order", 0))
-                is_favorite = True if "-" in highest_order.get("stat_type") else False
-
-
-                print("Potential Strategy Match")
-
-                strategy_bot = StrategyDiscordBot()
-                strategy = None
-
-                if all([
-                    is_favorite,
-                    SpreadSniper.LOW_ODDS.value <= odds <= SpreadSniper.HIGH_ODDS.value,
-                    SpreadSniper.LOW_HIGHEST_ORDER.value <= liquidity_highest_order <= SpreadSniper.HIGH_HIGHEST_ORDER.value,
-                    SpreadSniper.LOW_LIQ_DIFFERENCE.value <= liquidity_difference <= SpreadSniper.HIGH_LIQ_DIFFERENCE.value,
-                ]):
-                    strategy = "Sniper"
-
-                elif all([
-                    SpreadExecutive.LOW_ODDS.value <= odds <= SpreadExecutive.HIGH_ODDS.value,
-                    SpreadExecutive.LOW_HIGHEST_ORDER.value <= liquidity_highest_order <= SpreadExecutive.HIGH_HIGHEST_ORDER.value,
-                    SpreadExecutive.LOW_LIQ_DIFFERENCE.value <= liquidity_difference <= SpreadExecutive.HIGH_LIQ_DIFFERENCE.value,
-                ]):
-                    strategy = "Executive"
-
-                elif all([
-                    SpreadVolume.LOW_ODDS.value <= odds <= SpreadVolume.HIGH_ODDS.value,
-                    SpreadVolume.LOW_HIGHEST_ORDER.value <= liquidity_highest_order <= SpreadVolume.HIGH_HIGHEST_ORDER.value
-                ]):
-                    strategy = "Volume"
-
-                if strategy:
-                    print(f"Strategy Match: {strategy}")
-                    already_sent_redis.set(name=key, ex=int(start_date_dt.timestamp() * 1000), value="")
-
-                    strategy_bot.discord_message(
-                        highest_order=highest_order,
-                        market_data=value,
-                        strategy_type=strategy,
-                        stat_type="Spread",
-                        liquidity_difference=liquidity_difference
-                    )
-                else:
-                    print("No Strategy Match")
+    # def strategy_checker(self, strategy_redis: redis.Redis, already_sent_redis: redis.Redis, db:Database):
+    #     all_data = strategy_redis.keys("*")
+    #
+    #     stored_values = {
+    #         key: json.loads(player_data)
+    #         for key in all_data
+    #         if key
+    #         for player_data in strategy_redis.hgetall(key).values()
+    #     }
+    #
+    #
+    #     for key, value in stored_values.items():
+    #         start_date = value.get("additional_data", {}).get("game_start_time")
+    #         start_date_dt = datetime.fromisoformat(start_date.replace("Z", "+00:00"))
+    #
+    #         modified_date = start_date_dt - timedelta(minutes=9)
+    #         now_utc = datetime.now(timezone.utc)
+    #
+    #         already_sent = already_sent_redis.exists(key)
+    #
+    #         if not already_sent and now_utc >= modified_date:
+    #             matches = db.get_games(
+    #                 game_title=key,
+    #                 game_start_time=start_date_dt,
+    #                 league=value.get("league"),
+    #                 stat_type=value.get("additional_data", {}).get("stat_type")
+    #             )
+    #
+    #             if not matches:
+    #                 return
+    #
+    #             highest_order = max(
+    #                 matches,
+    #                 key=lambda x: x["liquidity_highest_order"]
+    #             )
+    #
+    #             liquidity_difference = float(highest_order.get("liquidity_difference", 0))
+    #             odds = float(highest_order.get("odds_highest_order", 0))
+    #             liquidity_highest_order = float(highest_order.get("liquidity_highest_order", 0))
+    #             is_favorite = True if "-" in highest_order.get("stat_type") else False
+    #
+    #
+    #             print("Potential Strategy Match")
+    #
+    #             strategy_bot = StrategyDiscordBot()
+    #             strategy = None
+    #
+    #             if all([
+    #                 is_favorite,
+    #                 SpreadSniper.LOW_ODDS.value <= odds <= SpreadSniper.HIGH_ODDS.value,
+    #                 SpreadSniper.LOW_HIGHEST_ORDER.value <= liquidity_highest_order <= SpreadSniper.HIGH_HIGHEST_ORDER.value,
+    #                 SpreadSniper.LOW_LIQ_DIFFERENCE.value <= liquidity_difference <= SpreadSniper.HIGH_LIQ_DIFFERENCE.value,
+    #             ]):
+    #                 strategy = "Sniper"
+    #
+    #             elif all([
+    #                 SpreadExecutive.LOW_ODDS.value <= odds <= SpreadExecutive.HIGH_ODDS.value,
+    #                 SpreadExecutive.LOW_HIGHEST_ORDER.value <= liquidity_highest_order <= SpreadExecutive.HIGH_HIGHEST_ORDER.value,
+    #                 SpreadExecutive.LOW_LIQ_DIFFERENCE.value <= liquidity_difference <= SpreadExecutive.HIGH_LIQ_DIFFERENCE.value,
+    #             ]):
+    #                 strategy = "Executive"
+    #
+    #             elif all([
+    #                 SpreadVolume.LOW_ODDS.value <= odds <= SpreadVolume.HIGH_ODDS.value,
+    #                 SpreadVolume.LOW_HIGHEST_ORDER.value <= liquidity_highest_order <= SpreadVolume.HIGH_HIGHEST_ORDER.value
+    #             ]):
+    #                 strategy = "Volume"
+    #
+    #             if strategy:
+    #                 print(f"Strategy Match: {strategy}")
+    #                 already_sent_redis.set(name=key, ex=int(start_date_dt.timestamp() * 1000), value="")
+    #
+    #                 strategy_bot.discord_message(
+    #                     highest_order=highest_order,
+    #                     market_data=value,
+    #                     strategy_type=strategy,
+    #                     stat_type="Spread",
+    #                     liquidity_difference=liquidity_difference
+    #                 )
+    #             else:
+    #                 print("No Strategy Match")
 
     # def strategy_storer(self, player_data: dict, start_time_dt: datetime, redis_instance: redis.Redis, pipeline):
     #     game_key = player_data.get("additional_data", {}).get("game_title")
@@ -198,7 +198,7 @@ class ProcessManager:
 
         redis_strategy_instance = redis.Redis(host="localhost", port=6379, db=8, decode_responses=True)
         strategy_pipeline = redis_strategy_instance.pipeline()
-        redis_strategy_sent_instance = redis.Redis(host="localhost", port=6379, db=9, decode_responses=True)
+        # redis_strategy_sent_instance = redis.Redis(host="localhost", port=6379, db=9, decode_responses=True)
 
         pipeline = self.redis_client.pipeline()
         db = Database()
@@ -233,6 +233,6 @@ class ProcessManager:
                 db.insert_data(player, league, self.market_type)
 
 
-        if league == "NBA" and self.market_type == "mainlines":
-            self.strategy_checker(already_sent_redis=redis_strategy_sent_instance, strategy_redis=redis_strategy_instance, db=db)
+        # if league == "NBA" and self.market_type == "mainlines":
+        #     self.strategy_checker(already_sent_redis=redis_strategy_sent_instance, strategy_redis=redis_strategy_instance, db=db)
 
