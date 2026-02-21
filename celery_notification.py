@@ -24,7 +24,7 @@ celery_app.conf.beat_schedule = {
     },
     "run_strategy_checker": {
         "task": "celery_notification.run_strategy_checker",
-        "schedule": timedelta(seconds=30),
+        "schedule": timedelta(seconds=60),
     },
 }
 
