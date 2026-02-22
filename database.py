@@ -77,6 +77,7 @@ class Database:
     def _update_database(self, data, existing_id):
         self.cursor.execute("""
             UPDATE novig_tracking SET
+                snapshot_time = CURRENT_TIMESTAMP,
                 game_start_time=%(game_start_time)s,
                 total_over_liquidity=%(total_over_liquidity)s,
                 total_under_liquidity=%(total_under_liquidity)s,
