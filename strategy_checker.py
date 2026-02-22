@@ -28,6 +28,14 @@ class SpreadVolume(Enum):
     LOW_HIGHEST_ORDER = 4800
     HIGH_HIGHEST_ORDER = 6000
 
+class SpreadWhale(Enum):
+    LOW_ODDS = -140
+    HIGH_ODDS = 140
+    LOW_HIGHEST_ORDER = 8500
+    LOW_LIQ_DIFFERENCE = 15000
+
+
+
 
 def strategy_checker():
     db = Database()
@@ -100,6 +108,13 @@ def strategy_checker():
                 SpreadVolume.LOW_HIGHEST_ORDER.value <= liquidity_highest_order <= SpreadVolume.HIGH_HIGHEST_ORDER.value
             ]):
                 strategy = "Volume"
+
+            elif all([
+                SpreadWhale.LOW_ODDS.value <= odds <= SpreadWhale.HIGH_ODDS.value,
+                liquidity_highest_order >= SpreadWhale.LOW_HIGHEST_ORDER.value,
+                liquidity_difference >= SpreadWhale.LOW_LIQ_DIFFERENCE.value,
+            ]):
+                strategy = "Whale"
 
             if strategy:
                 print(f"Strategy Match: {strategy}")
