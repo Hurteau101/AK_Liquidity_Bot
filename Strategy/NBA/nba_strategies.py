@@ -294,7 +294,7 @@ class NBATotalSilverUnder(Strategy):
 class NBATotalTrueSilverUnder(Strategy):
     HIGHEST_LINE = 235
     STRATEGY_COLOR = 0xA9A9A9
-    MINUTES_FROM_GAME_START = 6000
+    MINUTES_FROM_GAME_START = 60
 
     def __init__(self):
         super().__init__(strategy_type="True Silver Under")
