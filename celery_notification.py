@@ -5,7 +5,8 @@ from celery import Celery
 from Novig_Dir.novig_bot import NovigSender
 from Novig_Dir.novg_results import Results
 from ProcessManager import ProcessManager
-from strategy_checker import strategy_checker
+from Strategy.strategy_checker import run_strategy_check
+
 
 celery_app = Celery(
     "notify_user_celery",
@@ -30,7 +31,7 @@ celery_app.conf.beat_schedule = {
 
 @celery_app.task(name="celery_notification.run_strategy_checker")
 def run_strategy_checker():
-    strategy_checker()
+    run_strategy_check()
 
 @celery_app.task(name="celery_notification.update_results")
 def update_results():
