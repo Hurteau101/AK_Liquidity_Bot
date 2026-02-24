@@ -82,9 +82,9 @@ if __name__ == "__main__":
             nba_bot_prop.runner(),
         )
 
-        # nba_mainline_manager = ProcessManager(redis_database=3, difference_amount=3000, league="NBA",
-        #                                       market_type="mainlines")
-        # nba_mainline_manager.manger(nba_mainline_data["NBA"], "NBA")
+        nba_mainline_manager = ProcessManager(redis_database=3, difference_amount=3000, league="NBA",
+                                              market_type="mainlines")
+        nba_mainline_manager.manger(nba_mainline_data["NBA"], "NBA")
 
         nba_prop_manager = ProcessManager(redis_database=4, difference_amount=5000, league="NBA", market_type="props")
         nba_prop_manager.manger(nba_prop_data["NBA"], "NBA")

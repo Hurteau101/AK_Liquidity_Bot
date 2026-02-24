@@ -170,7 +170,7 @@ class NBATotalGoldUnder(Strategy):
         return stat_type == "total" and league == "nba"
 
     def run_match_analysis(self, matches: list, strategy_bot_instance, start_date: str) -> bool:
-        order, metrics = self._get_highest_order_metrics(matches=matches, highest_type="highest_liquidity_difference")
+        order, metrics = self._get_highest_order_metrics(matches=matches, highest_type="highest_liquidity_difference", highest_order_side="under")
 
         matched = (
             metrics["total_under_liquidity"] >= self.TOTAL_UNDER_LIQUIDITY
@@ -203,7 +203,7 @@ class NBATotalPlatinumUnder(Strategy):
         return stat_type == "total" and league == "nba"
 
     def run_match_analysis(self, matches: list, strategy_bot_instance, start_date: str) -> bool:
-        order, metrics = self._get_highest_order_metrics(matches=matches, highest_type="highest_liquidity_difference")
+        order, metrics = self._get_highest_order_metrics(matches=matches, highest_type="highest_liquidity_difference", highest_order_side="under")
 
         matched = (
             metrics["total_under_liquidity"] >= self.TOTAL_UNDER_LIQUIDITY
@@ -237,7 +237,7 @@ class NBATotalEliteOver(Strategy):
         return stat_type == "total" and league == "nba"
 
     def run_match_analysis(self, matches: list, strategy_bot_instance, start_date: str) -> bool:
-        order, metrics = self._get_highest_order_metrics(matches=matches, highest_type="highest_liquidity_difference")
+        order, metrics = self._get_highest_order_metrics(matches=matches, highest_type="highest_liquidity_difference", highest_order_side="over")
 
         matched = (
             metrics["total_over_liquidity"] >= self.TOTAL_OVER_LIQUIDITY
@@ -271,7 +271,7 @@ class NBATotalSilverUnder(Strategy):
         return stat_type == "total" and league == "nba"
 
     def run_match_analysis(self, matches: list, strategy_bot_instance, start_date: str) -> bool:
-        order, metrics = self._get_highest_order_metrics(matches=matches, highest_type="highest_liquidity_difference")
+        order, metrics = self._get_highest_order_metrics(matches=matches, highest_type="highest_liquidity_difference", highest_order_side="under")
 
         matched = (
             self.LOWEST_TOTAL_OVER_LIQUIDITY <= metrics["total_under_liquidity"] <= self.HIGHEST_TOTAL_OVER_LIQUIDITY
@@ -295,7 +295,7 @@ class NBATotalTrueSilverUnder(Strategy):
     HIGHEST_LINE = 235
     MINUTES_FROM_GAME_START = 60
     STRATEGY_COLOR = 0xA9A9A9
-    
+
     def __init__(self):
         super().__init__(strategy_type="True Silver Under")
 
@@ -303,7 +303,7 @@ class NBATotalTrueSilverUnder(Strategy):
         return stat_type == "total" and league == "nba"
 
     def run_match_analysis(self, matches: list, strategy_bot_instance, start_date: str) -> bool:
-        order, metrics = self._get_highest_order_metrics(matches=matches, highest_type="highest_liquidity_difference")
+        order, metrics = self._get_highest_order_metrics(matches=matches, highest_type="highest_liquidity_difference", highest_order_side="under")
 
         snapshot_time = metrics.get("snapshot_time")
         pacific = ZoneInfo("America/Los_Angeles")
@@ -321,7 +321,7 @@ class NBATotalTrueSilverUnder(Strategy):
         if not matched:
             return False
 
-        order.update({"pacific_snapshot": snapshot_time})
+        order.update({"pacific_snapshot": snapshot_time_pacific})
 
         self.send_message(
             strategy_bot_instance=strategy_bot_instance,
