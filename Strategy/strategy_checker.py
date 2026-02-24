@@ -56,12 +56,14 @@ def run_strategy_check():
             ]
 
             for strategy in strategies:
+                print("Checking strategy: ", strategy.__class__.__name__)
                 if strategy.part_of_strategy(
                         stat_type=value.get("stat_type").lower(), league=value.get("league").lower()
                 ) and strategy.run_match_analysis(matches=matches, strategy_bot_instance=strategy_bot, start_date=start_date):
                     redis_strategy_sent_instance.set(name=key, ex=int(start_date_dt.timestamp() * 1000), value="")
+                    print("- Match found")
                     break # Break since then a message was sent.
-
+                print("- No match found")
 
 
 run_strategy_check()
