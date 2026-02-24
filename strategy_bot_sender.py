@@ -78,18 +78,12 @@ class StrategyDiscordBot:
 
         fields.append({
             "name": "Liquidity Quick Summary",
-            "value": f"""```
-            Over {order_details.get('line')}: ${order_details.get('total_over_liquidity', 'N/A')} 
-
-            Under {order_details.get('line')}: ${order_details.get('total_under_liquidity', 'N/A')} 
-
-            Highest Order: ${order_details.get('liquidity_highest_order', 0)} [{order_details.get('highest_order_side', 'N/A').title()}]
-            Highest Order Odds: {DiscordBot.format_odds(order_details.get('odds_highest_order', 0))}
-
-            Liquidity Difference: ${order_details.get('liquidity_difference')}
-            {f"Snapshot Time: {snapshot_time} PST" if snapshot_time else ""}
-            ```""",
-            "inline": False
+            "value": f"```\n{order_details.get('spread_team_1_name')}: ${order_details.get('spread_team_1_total_liquidity', 'N/A')} \n"
+                     f"\n{order_details.get('spread_team_2_name')}: ${order_details.get('spread_team_2_total_liquidity', 'N/A')} \n\n"
+                     f"Highest Order: ${order_details.get('liquidity_highest_order', 0)} [{order_details.get('highest_order_side', 'N/A')}]\n"
+                     f"Highest Order Odds: {DiscordBot.format_odds(order_details.get('odds_highest_order', 0))}\n\n"
+                     f"Liquidity Difference: ${order_details.get('liquidity_difference')}\n\n"
+                     f"{f'Snapshot Time: {snapshot_time} \\n' if snapshot_time else ''}```",
         })
 
         link_data = self._create_links(
