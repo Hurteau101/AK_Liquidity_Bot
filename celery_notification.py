@@ -5,14 +5,13 @@ from celery import Celery
 from Novig_Dir.novig_bot import NovigSender
 from Novig_Dir.novg_results import Results
 from ProcessManager import ProcessManager
-from Strategy.strategy_checker import run_strategy_check
-
 
 celery_app = Celery(
     "notify_user_celery",
     broker="redis://localhost:6379/1",
     backend="redis://localhost:6379/1",
 )
+
 
 celery_app.conf.beat_schedule = {
     "send_notifications": {
@@ -22,16 +21,9 @@ celery_app.conf.beat_schedule = {
     "update_results": {
         "task": "celery_notification.update_results",
         "schedule": timedelta(hours=12),
-    },
-    "run_strategy_checker": {
-        "task": "celery_notification.run_strategy_checker",
-        "schedule": timedelta(seconds=60),
-    },
+    }
 }
 
-@celery_app.task(name="celery_notification.run_strategy_checker")
-def run_strategy_checker():
-    run_strategy_check()
 
 @celery_app.task(name="celery_notification.update_results")
 def update_results():
