@@ -14,6 +14,8 @@ class Strategy(ABC):
             "highest_order_liquidity": float(order.get("liquidity_highest_order", 0)),
             "liquidity_difference": float(order.get("liquidity_difference", 0)),
             "is_favorite": "-" in str(order.get("line", "")) if check_favourite else False,
+            "total_under_liquidity": float(order.get("total_under_liquidity", 0)),
+            "total_over_liquidity": float(order.get("total_over_liquidity", 0)),
             "line": order.get("line", 0),
             "snapshot_time": order.get("snapshot_time"),
         }

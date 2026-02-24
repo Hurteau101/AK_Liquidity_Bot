@@ -159,7 +159,7 @@ class NBASpreadWhale(Strategy):
         return True
 
 class NBATotalGoldUnder(Strategy):
-    LOWEST_LIQUIDITY_DIFFERENCE = 1
+    TOTAL_UNDER_LIQUIDITY = 20_000
     LOWEST_ODDS = 100
     STRATEGY_COLOR = 0xFFD700
 
@@ -173,7 +173,7 @@ class NBATotalGoldUnder(Strategy):
         order, metrics = self._get_highest_order_metrics(matches=matches, highest_type="highest_liquidity_difference")
 
         matched = (
-            metrics["liquidity_difference"] >= self.LOWEST_LIQUIDITY_DIFFERENCE
+            metrics["total_under_liquidity"] >= self.TOTAL_UNDER_LIQUIDITY
             and metrics["odds"] >= self.LOWEST_ODDS
         )
 
@@ -192,7 +192,7 @@ class NBATotalGoldUnder(Strategy):
         return True
 
 class NBATotalPlatinumUnder(Strategy):
-    LOWEST_LIQUIDITY_DIFFERENCE = 10_000
+    TOTAL_UNDER_LIQUIDITY = 10_000
     LOWEST_LINE = 235
     STRATEGY_COLOR = 0xC75A00
 
@@ -206,7 +206,7 @@ class NBATotalPlatinumUnder(Strategy):
         order, metrics = self._get_highest_order_metrics(matches=matches, highest_type="highest_liquidity_difference")
 
         matched = (
-            metrics["liquidity_difference"] >= self.LOWEST_LIQUIDITY_DIFFERENCE
+            metrics["total_under_liquidity"] >= self.TOTAL_UNDER_LIQUIDITY
             and metrics["line"] >= self.LOWEST_LINE
         )
 
@@ -225,7 +225,7 @@ class NBATotalPlatinumUnder(Strategy):
         return True
 
 class NBATotalEliteOver(Strategy):
-    LOWEST_LIQUIDITY_DIFFERENCE = 10_000
+    TOTAL_OVER_LIQUIDITY = 10_000
     LOWEST_LINE = 235
     LOWEST_ODDS = 100
     STRATEGY_COLOR = 0x0D0D0D
@@ -240,7 +240,7 @@ class NBATotalEliteOver(Strategy):
         order, metrics = self._get_highest_order_metrics(matches=matches, highest_type="highest_liquidity_difference")
 
         matched = (
-            metrics["liquidity_difference"] >= self.LOWEST_LIQUIDITY_DIFFERENCE
+            metrics["total_over_liquidity"] >= self.TOTAL_OVER_LIQUIDITY
             and metrics["line"] >= self.LOWEST_LINE
             and metrics["odds"] >= self.LOWEST_ODDS
         )
@@ -260,8 +260,8 @@ class NBATotalEliteOver(Strategy):
         return True
 
 class NBATotalSilverUnder(Strategy):
-    LOWEST_LIQUIDITY_DIFFERENCE = 10_000
-    HIGHEST_LIQUIDITY_DIFFERENCE = 20_000
+    LOWEST_TOTAL_OVER_LIQUIDITY = 10_000
+    HIGHEST_TOTAL_OVER_LIQUIDITY = 20_000
     STRATEGY_COLOR = 0xE8E8E8
 
     def __init__(self):
@@ -274,7 +274,7 @@ class NBATotalSilverUnder(Strategy):
         order, metrics = self._get_highest_order_metrics(matches=matches, highest_type="highest_liquidity_difference")
 
         matched = (
-            self.LOWEST_LIQUIDITY_DIFFERENCE <= metrics["liquidity_difference"] <= self.HIGHEST_LIQUIDITY_DIFFERENCE
+            self.LOWEST_TOTAL_OVER_LIQUIDITY <= metrics["total_under_liquidity"] <= self.HIGHEST_TOTAL_OVER_LIQUIDITY
         )
 
         if not matched:
@@ -293,9 +293,9 @@ class NBATotalSilverUnder(Strategy):
 
 class NBATotalTrueSilverUnder(Strategy):
     HIGHEST_LINE = 235
-    STRATEGY_COLOR = 0xA9A9A9
     MINUTES_FROM_GAME_START = 60
-
+    STRATEGY_COLOR = 0xA9A9A9
+    
     def __init__(self):
         super().__init__(strategy_type="True Silver Under")
 

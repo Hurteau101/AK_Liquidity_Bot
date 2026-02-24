@@ -75,12 +75,13 @@ class ProcessManager:
         db = Database()
 
         for player in player_data:
-
             # Ensure crazy high odds aren't stored or pinged.
-            if all(
-                    side_data["highest_order"]["cost_avg_odds"] >= 250
-                    for side_data in player["liquidity"].values()
-            ):
+            highest = max(
+                player["liquidity"].values(),
+                key=lambda x: x["highest_order"]["total_liquidity"]
+            )["highest_order"]
+
+            if highest.get("cost_avg_odds") >= 250:
                 continue
 
             player_key = player.get("key_name")
