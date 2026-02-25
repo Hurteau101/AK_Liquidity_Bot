@@ -324,7 +324,7 @@ class NBATotalTrueSilverUnder(Strategy):
             return False
 
         order.update({"pacific_snapshot": snapshot_time_pacific})
-        print(order)
+
         self.send_message(
             strategy_bot_instance=strategy_bot_instance,
             highest_order=order,
