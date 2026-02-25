@@ -4,8 +4,8 @@ from Strategy.strategy_checker import run_strategy_check
 
 celery_app = Celery(
     "strategy_celery",
-    broker="redis://localhost:6379/2",
-    backend="redis://localhost:6379/2",
+    broker="redis://localhost:6379/8",
+    backend="redis://localhost:6379/8",
 )
 
 celery_app.conf.beat_schedule = {

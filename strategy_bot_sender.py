@@ -75,6 +75,7 @@ class StrategyDiscordBot:
         snapshot_time = order_details.get('pacific_snapshot') if order_details.get('pacific_snapshot') else None
         if snapshot_time:
             snapshot_time = snapshot_time.strftime("%H:%M")
+            print(snapshot_time)
 
         fields.append({
             "name": "Liquidity Quick Summary",
@@ -83,7 +84,7 @@ class StrategyDiscordBot:
                      f"Highest Order: ${order_details.get('liquidity_highest_order', 0)} [{order_details.get('highest_order_side', 'N/A').title()}]\n"
                      f"Highest Order Odds: {DiscordBot.format_odds(order_details.get('odds_highest_order', 0))}\n\n"
                      f"Liquidity Difference: ${order_details.get('liquidity_difference')}\n\n"
-                     f"{f'Snapshot Time: {snapshot_time} \\n' if snapshot_time else ''}```",
+                     f"{f'Snapshot Time: {snapshot_time} PST\n' if snapshot_time else ''}```",
         })
 
         link_data = self._create_links(

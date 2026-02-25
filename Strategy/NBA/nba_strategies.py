@@ -292,7 +292,8 @@ class NBATotalSilverUnder(Strategy):
         return True
 
 class NBATotalTrueSilverUnder(Strategy):
-    HIGHEST_LINE = 235
+    # HIGHEST_LINE = 235
+    HIGHEST_LINE = 1200
     MINUTES_FROM_GAME_START = 60
     STRATEGY_COLOR = 0xA9A9A9
 
@@ -311,6 +312,7 @@ class NBATotalTrueSilverUnder(Strategy):
         start_date_dt = datetime.fromisoformat(start_date)
         pacific_start_dt = start_date_dt.astimezone(pacific)
 
+
         modified_start_date_dt = pacific_start_dt - timedelta(minutes=self.MINUTES_FROM_GAME_START)
 
         matched = (
@@ -322,7 +324,7 @@ class NBATotalTrueSilverUnder(Strategy):
             return False
 
         order.update({"pacific_snapshot": snapshot_time_pacific})
-
+        print(order)
         self.send_message(
             strategy_bot_instance=strategy_bot_instance,
             highest_order=order,
@@ -333,3 +335,4 @@ class NBATotalTrueSilverUnder(Strategy):
         )
 
         return True
+
