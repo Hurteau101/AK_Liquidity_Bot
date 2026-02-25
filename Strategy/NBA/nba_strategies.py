@@ -292,8 +292,9 @@ class NBATotalSilverUnder(Strategy):
         return True
 
 class NBATotalTrueSilverUnder(Strategy):
-    # HIGHEST_LINE = 235
-    HIGHEST_LINE = 1200
+    LOWEST_LIQUIDITY_DIFFERENCE = 10_000
+    HIGHEST_LIQUIDITY_DIFFERENCE  = 20_000
+    HIGHEST_LINE = 235
     MINUTES_FROM_GAME_START = 60
     STRATEGY_COLOR = 0xA9A9A9
 
@@ -316,7 +317,8 @@ class NBATotalTrueSilverUnder(Strategy):
         modified_start_date_dt = pacific_start_dt - timedelta(minutes=self.MINUTES_FROM_GAME_START)
 
         matched = (
-            metrics["line"] <= self.HIGHEST_LINE
+            self.LOWEST_LIQUIDITY_DIFFERENCE <= metrics["liquidity_difference"] <= self.HIGHEST_LIQUIDITY_DIFFERENCE
+            and metrics["line"] <= self.HIGHEST_LINE
             and modified_start_date_dt <= snapshot_time_pacific <= pacific_start_dt
         )
 
