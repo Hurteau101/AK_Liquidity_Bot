@@ -22,6 +22,7 @@ def run_strategy_check():
     }
 
     for key, value in stored_values.items():
+
         start_date = value.get("start_date", {})
         start_date_dt = datetime.fromisoformat(start_date.replace("Z", "+00:00"))
         modified_date = start_date_dt - timedelta(minutes=9)
@@ -29,41 +30,41 @@ def run_strategy_check():
 
         already_sent = redis_strategy_sent_instance.exists(key)
 
-        if not already_sent and now_utc >= modified_date:
-            matches = db.get_games(
-                game_title=value.get("game_title"),
-                game_start_time=start_date_dt,
-                league=value.get("league"),
-                stat_type=value.get("stat_type")
-            )
+        # if not already_sent and now_utc >= modified_date:
+        matches = db.get_games(
+            game_title=value.get("game_title"),
+            game_start_time=start_date_dt,
+            league=value.get("league"),
+            stat_type=value.get("stat_type")
+        )
 
-            if not matches:
-                continue
+        if not matches:
+            continue
 
-            strategy_bot = StrategyDiscordBot()
+        strategy_bot = StrategyDiscordBot()
 
-            # Order matters
-            strategies = [
-                NBASpreadSniper(),
-                NBASpreadVolume(),
-                NBASpreadExecutive(),
-                NBASpreadWhale(),
-                NBATotalGoldUnder(),
-                NBATotalPlatinumUnder(),
-                NBATotalEliteOver(),
-                NBATotalSilverUnder(),
-                NBATotalTrueSilverUnder()
-            ]
+        # Order matters
+        strategies = [
+            NBASpreadSniper(),
+            NBASpreadVolume(),
+            NBASpreadExecutive(),
+            NBASpreadWhale(),
+            NBATotalGoldUnder(),
+            NBATotalPlatinumUnder(),
+            NBATotalEliteOver(),
+            NBATotalSilverUnder(),
+            NBATotalTrueSilverUnder()
+        ]
 
-            for strategy in strategies:
-                print("Checking strategy: ", strategy.__class__.__name__)
-                if strategy.part_of_strategy(
-                        stat_type=value.get("stat_type").lower(), league=value.get("league").lower()
-                ) and strategy.run_match_analysis(matches=matches, strategy_bot_instance=strategy_bot, start_date=start_date):
-                    redis_strategy_sent_instance.set(name=key, ex=int(start_date_dt.timestamp() * 1000), value="")
-                    print("- Match found")
-                    break # Break since then a message was sent.
-                print("- No match found")
+        for strategy in strategies:
+            print("Checking strategy: ", strategy.__class__.__name__)
+            if strategy.part_of_strategy(
+                    stat_type=value.get("stat_type").lower(), league=value.get("league").lower()
+            ) and strategy.run_match_analysis(matches=matches, strategy_bot_instance=strategy_bot, start_date=start_date):
+                redis_strategy_sent_instance.set(name=key, ex=int(start_date_dt.timestamp() * 1000), value="")
+                print("- Match found")
+                break # Break since then a message was sent.
+            print("- No match found")
 
 
-# run_strategy_check()
+run_strategy_check()
