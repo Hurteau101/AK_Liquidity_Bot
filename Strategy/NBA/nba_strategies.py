@@ -130,8 +130,46 @@ class NBASpreadVolume(Strategy):
 
         return True
 
+class NBASpreadValueHunter(Strategy):
+    LOWEST_ODDS = 100
+    HIGHEST_ODDS = 125
+    LOWEST_HIGHEST_ORDER = 10_000
+    STRATEGY_COLOR = 0xC75A00
+
+
+    def __init__(self):
+        super().__init__(strategy_type="Value Hunter")
+
+    def part_of_strategy(self, stat_type: str, league: str) -> bool:
+        return stat_type == "spread" and league == "nba"
+
+    def run_match_analysis(self, matches: list, strategy_bot_instance, start_date: str) -> bool:
+        order, metrics = self._get_highest_order_metrics(matches)
+
+        if not order or not metrics:
+            return False
+
+        matched = (
+                self.LOWEST_ODDS <= metrics["odds"] <= self.HIGHEST_ODDS
+                and metrics["highest_order_liquidity"] >= self.LOWEST_HIGHEST_ORDER
+        )
+
+        if not matched:
+            return False
+
+        self.send_message(
+            strategy_bot_instance=strategy_bot_instance,
+            highest_order=order,
+            strategy_type=self.strategy_type,
+            start_date=start_date,
+            strategy_color=self.STRATEGY_COLOR,
+            stat_type="spread"
+        )
+
+        return True
+
 class NBASpreadWhale(Strategy):
-    LOWEST_ODDS = -40
+    LOWEST_ODDS = -140
     HIGHEST_ODDS = 140
     LOWEST_HIGHEST_ORDER = 8500
     LOWEST_LIQUIDITY_DIFFERENCE = 15000

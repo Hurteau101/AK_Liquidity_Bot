@@ -2,7 +2,8 @@ from datetime import datetime, timezone, timedelta
 import json
 import redis
 from Strategy.NBA.nba_strategies import NBASpreadSniper, NBASpreadVolume, NBASpreadExecutive, NBASpreadWhale, \
-    NBATotalGoldUnder, NBATotalPlatinumUnder, NBATotalEliteOver, NBATotalSilverUnder, NBATotalTrueSilverUnder
+    NBATotalGoldUnder, NBATotalPlatinumUnder, NBATotalEliteOver, NBATotalSilverUnder, NBATotalTrueSilverUnder, \
+    NBASpreadValueHunter
 from database import Database
 from strategy_bot_sender import StrategyDiscordBot
 
@@ -48,6 +49,7 @@ def run_strategy_check():
                 NBASpreadSniper(),
                 NBASpreadVolume(),
                 NBASpreadExecutive(),
+                NBASpreadValueHunter(),
                 NBASpreadWhale(),
                 NBATotalGoldUnder(),
                 NBATotalPlatinumUnder(),
