@@ -7,3 +7,4 @@ __pycache__/
 novig_tracking.xlsx
 .idea/
 internal.md
+celerybeat-schedule
