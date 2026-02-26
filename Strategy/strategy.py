@@ -41,7 +41,8 @@ class Strategy(ABC):
         ) if highest_type == "highest_order" else (
             max(
                 (match for match in matches if match.get("highest_order_side") == highest_order_side),
-                key=lambda x: x["liquidity_difference"]
+                key=lambda x: x["liquidity_difference"],
+                default=None
             )
         )
 

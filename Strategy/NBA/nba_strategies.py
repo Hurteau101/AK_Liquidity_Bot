@@ -23,6 +23,9 @@ class NBASpreadSniper(Strategy):
     def run_match_analysis(self, matches: list, strategy_bot_instance, start_date: str) -> bool:
         order, metrics = self._get_highest_order_metrics(matches=matches, check_favourite=True)
 
+        if not order or not metrics:
+            return False
+
         matched = (
             metrics["is_favorite"]
             and self.LOWEST_ODDS <= metrics["odds"] <= self.HIGHEST_ODDS
@@ -65,6 +68,9 @@ class NBASpreadExecutive(Strategy):
     def run_match_analysis(self, matches: list, strategy_bot_instance, start_date: str) -> bool:
         order, metrics = self._get_highest_order_metrics(matches)
 
+        if not order or not metrics:
+            return False
+
         matched = (
                 self.LOWEST_ODDS <= metrics["odds"] <= self.HIGHEST_ODDS
                 and self.LOWEST_HIGHEST_ORDER <= metrics["highest_order_liquidity"] <= self.HIGHEST_HIGHEST_ORDER
@@ -102,6 +108,9 @@ class NBASpreadVolume(Strategy):
     def run_match_analysis(self, matches: list, strategy_bot_instance, start_date: str) -> bool:
         order, metrics = self._get_highest_order_metrics(matches)
 
+        if not order or not metrics:
+            return False
+
         matched = (
                 self.LOWEST_ODDS <= metrics["odds"] <= self.HIGHEST_ODDS
                 and self.LOWEST_HIGHEST_ORDER <= metrics["liquidity_difference"] <= self.HIGHEST_HIGHEST_ORDER
@@ -138,6 +147,9 @@ class NBASpreadWhale(Strategy):
     def run_match_analysis(self, matches: list, strategy_bot_instance, start_date: str) -> bool:
         order, metrics = self._get_highest_order_metrics(matches)
 
+        if not order or not metrics:
+            return False
+
         matched = (
                 self.LOWEST_ODDS <= metrics["odds"] <= self.HIGHEST_ODDS
                 and metrics["highest_order_liquidity"] >= self.LOWEST_HIGHEST_ORDER
@@ -172,6 +184,9 @@ class NBATotalGoldUnder(Strategy):
     def run_match_analysis(self, matches: list, strategy_bot_instance, start_date: str) -> bool:
         order, metrics = self._get_highest_order_metrics(matches=matches, highest_type="highest_liquidity_difference", highest_order_side="under")
 
+        if not order or not metrics:
+            return False
+
         matched = (
             metrics["liquidity_difference"] >= self.LOWEST_LIQUIDITY_DIFFERENCE
             and metrics["odds"] >= self.LOWEST_ODDS
@@ -204,6 +219,9 @@ class NBATotalPlatinumUnder(Strategy):
 
     def run_match_analysis(self, matches: list, strategy_bot_instance, start_date: str) -> bool:
         order, metrics = self._get_highest_order_metrics(matches=matches, highest_type="highest_liquidity_difference", highest_order_side="under")
+
+        if not order or not metrics:
+            return False
 
         matched = (
             metrics["liquidity_difference"] >= self.LOWEST_LIQUIDITY_DIFFERENCE
@@ -239,6 +257,9 @@ class NBATotalEliteOver(Strategy):
     def run_match_analysis(self, matches: list, strategy_bot_instance, start_date: str) -> bool:
         order, metrics = self._get_highest_order_metrics(matches=matches, highest_type="highest_liquidity_difference", highest_order_side="over")
 
+        if not order or not metrics:
+            return False
+
         matched = (
             metrics["liquidity_difference"] >= self.LOWEST_LIQUIDITY_DIFFERENCE
             and metrics["line"] >= self.LOWEST_LINE
@@ -273,6 +294,9 @@ class NBATotalSilverUnder(Strategy):
     def run_match_analysis(self, matches: list, strategy_bot_instance, start_date: str) -> bool:
         order, metrics = self._get_highest_order_metrics(matches=matches, highest_type="highest_liquidity_difference", highest_order_side="under")
 
+        if not order or not metrics:
+            return False
+
         matched = (
             self.LOWEST_LIQUIDITY_DIFFERENCE <= metrics["liquidity_difference"] <= self.HIGHEST_LIQUIDITY_DIFFERENCE
         )
@@ -306,6 +330,9 @@ class NBATotalTrueSilverUnder(Strategy):
 
     def run_match_analysis(self, matches: list, strategy_bot_instance, start_date: str) -> bool:
         order, metrics = self._get_highest_order_metrics(matches=matches, highest_type="highest_liquidity_difference", highest_order_side="under")
+
+        if not order or not metrics:
+            return False
 
         snapshot_time = metrics.get("snapshot_time")
         pacific = ZoneInfo("America/Los_Angeles")
