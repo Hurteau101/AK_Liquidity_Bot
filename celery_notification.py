@@ -8,8 +8,8 @@ from ProcessManager import ProcessManager
 
 celery_app = Celery(
     "notify_user_celery",
-    broker="redis://localhost:6379/9",
-    backend="redis://localhost:6379/9",
+    broker="redis://localhost:6379/6",
+    backend="redis://localhost:6379/6",
 )
 
 
