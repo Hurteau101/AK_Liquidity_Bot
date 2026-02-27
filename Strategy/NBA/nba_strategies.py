@@ -113,7 +113,7 @@ class NBASpreadVolume(Strategy):
 
         matched = (
                 self.LOWEST_ODDS <= metrics["odds"] <= self.HIGHEST_ODDS
-                and self.LOWEST_HIGHEST_ORDER <= metrics["liquidity_difference"] <= self.HIGHEST_HIGHEST_ORDER
+                and self.LOWEST_HIGHEST_ORDER <= metrics["highest_order_liquidity"] <= self.HIGHEST_HIGHEST_ORDER
         )
 
         if not matched:

@@ -47,8 +47,8 @@ def run_strategy_check():
             # Order matters
             strategies = [
                 NBASpreadSniper(),
-                NBASpreadVolume(),
                 NBASpreadExecutive(),
+                NBASpreadVolume(),
                 NBASpreadValueHunter(),
                 NBASpreadWhale(),
                 NBATotalGoldUnder(),
