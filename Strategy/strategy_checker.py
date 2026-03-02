@@ -54,8 +54,8 @@ def run_strategy_check():
                 NBATotalGoldUnder(),
                 NBATotalPlatinumUnder(),
                 NBATotalEliteOver(),
-                NBATotalSilverUnder(),
-                NBATotalTrueSilverUnder()
+                NBATotalTrueSilverUnder(),
+                NBATotalSilverUnder()
             ]
 
             for strategy in strategies:
