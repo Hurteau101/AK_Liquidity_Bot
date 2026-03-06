@@ -8,7 +8,7 @@ from Strategy.NCAAB.ncaab_strategies import NCAABTotalSkyHigh, NCAABTotalUnder, 
 from database import Database
 from strategy_bot_sender import StrategyDiscordBot
 
-
+# Order matters
 STRATEGIES = {
     "NBA": [
         NBASpreadSniper(),
@@ -62,17 +62,13 @@ def run_strategy_check():
                 stat_type=value.get("stat_type")
             )
 
-
-
             if not matches:
                 continue
 
             strategy_bot = StrategyDiscordBot()
 
-            # Order matters
             league = value.get("league").upper()
             mapped_strategy = STRATEGIES.get(league, [])
-
 
             for strategy in mapped_strategy:
                 print("Checking strategy: ", strategy.__class__.__name__)
