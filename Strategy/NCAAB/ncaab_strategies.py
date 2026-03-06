@@ -112,7 +112,7 @@ class NCAABTotalGoldMine(Strategy):
 
 
 class NCAABTotalLowLine(Strategy):
-    HIGHEST_LINE = 1400
+    HIGHEST_LINE = 140
     STRATEGY_COLOR = 0x2F2F2F
 
     def __init__(self):
