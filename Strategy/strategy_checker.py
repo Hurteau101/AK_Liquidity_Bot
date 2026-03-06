@@ -3,7 +3,7 @@ import json
 import redis
 from Strategy.NBA.nba_strategies import NBASpreadSniper, NBASpreadVolume, NBASpreadExecutive, NBASpreadWhale, \
     NBATotalGoldUnder, NBATotalPlatinumUnder, NBATotalEliteOver, NBATotalSilverUnder, NBATotalTrueSilverUnder, \
-    NBASpreadValueHunter
+    NBASpreadValueHunter, NBASpreadVolumeFavorites, NBASpreadGodTier
 from Strategy.NCAAB.ncaab_strategies import NCAABTotalSkyHigh, NCAABTotalUnder, NCAABTotalGoldMine, NCAABTotalLowLine, NCAABTotalOverHighJuice
 from database import Database
 from strategy_bot_sender import StrategyDiscordBot
@@ -11,11 +11,14 @@ from strategy_bot_sender import StrategyDiscordBot
 # Order matters
 STRATEGIES = {
     "NBA": [
+        NBASpreadValueHunter(),
+        NBASpreadGodTier(),
+        NBASpreadWhale(),
+        NBASpreadVolumeFavorites(),
         NBASpreadSniper(),
         NBASpreadExecutive(),
         NBASpreadVolume(),
-        NBASpreadValueHunter(),
-        NBASpreadWhale(),
+
         NBATotalGoldUnder(),
         NBATotalPlatinumUnder(),
         NBATotalEliteOver(),

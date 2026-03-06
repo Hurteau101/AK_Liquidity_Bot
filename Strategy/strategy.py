@@ -4,7 +4,9 @@ class Strategy(ABC):
     def __init__(self, strategy_type: str):
         self.strategy_type = strategy_type
 
-    def _get_highest_order_metrics(self, matches: list, check_favourite: bool = False, highest_type: str = "highest_order", highest_order_side: str = None):
+    def _get_highest_order_metrics(self, matches: list, check_favourite: bool = False,
+                                   highest_type: str = "highest_order", highest_order_side: str = None,
+                                   check_underdog: bool = False):
         order = self.highest_order_getter(highest_type=highest_type, matches=matches, highest_order_side=highest_order_side)
         if not order:
             return None, None
@@ -14,6 +16,7 @@ class Strategy(ABC):
             "highest_order_liquidity": float(order.get("liquidity_highest_order", 0)),
             "liquidity_difference": float(order.get("liquidity_difference", 0)),
             "is_favorite": "-" in str(order.get("highest_order_side", "")) if check_favourite else False,
+            "is_underdog": "-" not in str(order.get("highest_order_side", "")) if check_underdog else False,
             "total_under_liquidity": float(order.get("total_under_liquidity", 0)) if order.get("total_under_liquidity") else 0,
             "total_over_liquidity": float(order.get("total_over_liquidity", 0)) if order.get("total_over_liquidity") else 0,
             "line": order.get("line", 0),

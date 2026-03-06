@@ -91,6 +91,47 @@ class NBASpreadExecutive(Strategy):
 
         return True
 
+class NBASpreadVolumeFavorites(Strategy):
+    LOWEST_ODDS = -125
+    HIGHEST_ODDS = 125
+    LOWEST_HIGHEST_ORDER = 4800
+    HIGHEST_HIGHEST_ORDER = 6000
+    STRATEGY_COLOR = 0x85C1E9
+
+
+    def __init__(self):
+        super().__init__(strategy_type="Volume Favorites")
+
+    def part_of_strategy(self, stat_type: str, league: str) -> bool:
+        return stat_type == "spread" and league == "nba"
+
+    def run_match_analysis(self, matches: list, strategy_bot_instance, start_date: str) -> bool:
+        order, metrics = self._get_highest_order_metrics(matches, check_favourite=True)
+
+        if not order or not metrics:
+            return False
+
+        matched = (
+            metrics["is_favorite"]
+            and self.LOWEST_ODDS <= metrics["odds"] <= self.HIGHEST_ODDS
+            and self.LOWEST_HIGHEST_ORDER <= metrics["highest_order_liquidity"] <= self.HIGHEST_HIGHEST_ORDER
+        )
+
+        if not matched:
+            return False
+
+        self.send_message(
+            strategy_bot_instance=strategy_bot_instance,
+            highest_order=order,
+            strategy_type=self.strategy_type,
+            start_date=start_date,
+            strategy_color=self.STRATEGY_COLOR,
+            stat_type="spread"
+        )
+
+        return True
+
+
 class NBASpreadVolume(Strategy):
     LOWEST_ODDS = -125
     HIGHEST_ODDS = 125
@@ -130,6 +171,7 @@ class NBASpreadVolume(Strategy):
 
         return True
 
+
 class NBASpreadValueHunter(Strategy):
     LOWEST_ODDS = 100
     HIGHEST_ODDS = 125
@@ -150,8 +192,9 @@ class NBASpreadValueHunter(Strategy):
             return False
 
         matched = (
-                self.LOWEST_ODDS <= metrics["odds"] <= self.HIGHEST_ODDS
-                and metrics["highest_order_liquidity"] >= self.LOWEST_HIGHEST_ORDER
+            metrics["is_underdog"]
+            and self.LOWEST_ODDS <= metrics["odds"] <= self.HIGHEST_ODDS
+            and metrics["highest_order_liquidity"] >= self.LOWEST_HIGHEST_ORDER
         )
 
         if not matched:
@@ -207,6 +250,51 @@ class NBASpreadWhale(Strategy):
         )
 
         return True
+
+class NBASpreadGodTier(Strategy):
+    LOWEST_ODDS = 100
+    HIGHEST_ODDS = 140
+    LOWEST_HIGHEST_ORDER = 8500
+    LOWEST_LIQUIDITY_DIFFERENCE = 15000
+    STRATEGY_COLOR = 0x7AF99A
+
+
+    def __init__(self):
+        super().__init__(strategy_type="God Tier")
+
+    def part_of_strategy(self, stat_type: str, league: str) -> bool:
+        return stat_type == "spread" and league == "nba"
+
+    def run_match_analysis(self, matches: list, strategy_bot_instance, start_date: str) -> bool:
+        order, metrics = self._get_highest_order_metrics(matches, check_favourite=True)
+
+        if not order or not metrics:
+            return False
+
+        matched = (
+                metrics["is_favorite"]
+                and self.LOWEST_ODDS <= metrics["odds"] <= self.HIGHEST_ODDS
+                and metrics["highest_order_liquidity"] >= self.LOWEST_HIGHEST_ORDER
+                and metrics["liquidity_difference"] >= self.LOWEST_LIQUIDITY_DIFFERENCE
+        )
+
+        if not matched:
+            return False
+
+        self.send_message(
+            strategy_bot_instance=strategy_bot_instance,
+            highest_order=order,
+            strategy_type=self.strategy_type,
+            start_date=start_date,
+            strategy_color=self.STRATEGY_COLOR,
+            stat_type="spread"
+        )
+
+        return True
+
+
+
+############# TOTALS ################
 
 class NBATotalGoldUnder(Strategy):
     LOWEST_LIQUIDITY_DIFFERENCE = 20_000
