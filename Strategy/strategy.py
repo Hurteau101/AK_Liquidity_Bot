@@ -35,16 +35,18 @@ class Strategy(ABC):
         if highest_type not in ["highest_order", "highest_liquidity_difference"]:
             raise ValueError("highest_type must be either 'highest_order' or 'highest_liquidity_difference'")
 
-        return max(
-            matches,
-            key=lambda x: x["liquidity_highest_order"]
-        ) if highest_type == "highest_order" else (
-            max(
-                (match for match in matches if match.get("highest_order_side") == highest_order_side),
-                key=lambda x: x["liquidity_difference"],
-                default=None
-            )
+        if highest_type == "highest_order":
+            return max(matches, key=lambda x: x["liquidity_highest_order"], default=None)
+
+        filtered_matches = (
+            (match for match in matches if match.get("highest_order_side") == highest_order_side)
+            if highest_order_side is not None
+            else matches
         )
+
+        return max(filtered_matches, key=lambda x: x["liquidity_difference"], default=None)
+
+
 
     def send_message(self, strategy_bot_instance, highest_order: dict, strategy_type: str, start_date: str,
                      strategy_color: int, stat_type: str):

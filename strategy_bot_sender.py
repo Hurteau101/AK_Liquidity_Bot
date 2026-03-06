@@ -5,18 +5,27 @@ from discordwebhook import Discord
 from dotenv import load_dotenv
 from discord_sender import DiscordBot
 
+load_dotenv()
+ROLE_ID = os.getenv("ALERT_ROLE_ID")
+
 class StrategyDiscordBot:
     load_dotenv()
-    def __init__(self):
-        load_dotenv()
-        webhook_url = os.getenv("STRATEGY_BOT_WEBHOOK_URL")
-        if not webhook_url:
-            raise ValueError("Please set STRATEGY_BOT_WEBHOOK_URL")
-
-        self.discord = Discord(url=webhook_url)
-
 
     def discord_message(self, order_details: dict, strategy_type: str, game_time: str, strategy_color: int, stat_type: str):
+        league = order_details.get("league")
+
+        webhook_mapper = {
+            "NBA": os.getenv("STRATEGY_BOT_WEBHOOK_URL_NBA"),
+            "NCAAB": os.getenv("STRATEGY_BOT_WEBHOOK_URL_NCAAB"),
+        }
+
+        webhook_url = webhook_mapper.get(league.upper())
+        if not webhook_url:
+            print(f"Couldn't find webhook URL for strategy type: {strategy_type}")
+            return
+
+        discord = Discord(url=webhook_url)
+
         game_start_time = DiscordBot.get_time_pacific(game_start=game_time)
 
         stat_type = stat_type.lower()
@@ -29,7 +38,10 @@ class StrategyDiscordBot:
         notification = selections.get(stat_type)(order_details=order_details, game_time=game_start_time, discord_color=strategy_color,
                                                  strategy_type=strategy_type)
 
-        self.discord.post(embeds=[notification])
+        discord.post(
+            content=f"<@&{ROLE_ID}>" if ROLE_ID else "",
+            embeds=[notification]
+        )
 
 
     def _create_heading(self, order_details: dict, game_time: str):
