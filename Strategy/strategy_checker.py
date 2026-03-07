@@ -30,7 +30,7 @@ STRATEGIES = {
         NCAABTotalUnder(),
         NCAABTotalGoldMine(),
         NCAABTotalLowLine(),
-        NCAABTotalOverHighJuice
+        NCAABTotalOverHighJuice(),
     ]
 }
 
