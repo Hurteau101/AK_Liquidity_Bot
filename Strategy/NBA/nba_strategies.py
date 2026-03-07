@@ -186,7 +186,7 @@ class NBASpreadValueHunter(Strategy):
         return stat_type == "spread" and league == "nba"
 
     def run_match_analysis(self, matches: list, strategy_bot_instance, start_date: str) -> bool:
-        order, metrics = self._get_highest_order_metrics(matches)
+        order, metrics = self._get_highest_order_metrics(matches, check_underdog=True)
 
         if not order or not metrics:
             return False
