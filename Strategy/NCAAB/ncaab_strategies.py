@@ -12,12 +12,36 @@ class NCAABTotalSkyHigh(Strategy):
         return stat_type == "total" and league == "ncaab"
 
     def run_match_analysis(self, matches: list, strategy_bot_instance, start_date: str) -> bool:
-        order, metrics = self._get_highest_order_metrics(matches=matches, highest_type="highest_liquidity_difference", highest_order_side="over")
-        if not order or not metrics:
+        pass
+        # order, metrics = self._get_highest_order_metrics(matches=matches, highest_type="highest_liquidity_difference", highest_order_side="over")
+        # if not order or not metrics:
+        #     return False
+        #
+        # matched = (
+        #     metrics["line"] > self.LOWEST_LINE
+        # )
+        #
+        # if not matched:
+        #     return False
+        #
+        #
+        # self.send_message(
+        #     strategy_bot_instance=strategy_bot_instance,
+        #     highest_order=order,
+        #     strategy_type=self.strategy_type,
+        #     start_date=start_date,
+        #     strategy_color=self.STRATEGY_COLOR,
+        #     stat_type="total"
+        # )
+        #
+        # return True
+
+    def run_match_modified_analysis(self, order: dict, strategy_bot_instance, start_date: str) -> bool:
+        if not order:
             return False
 
         matched = (
-            metrics["line"] > self.LOWEST_LINE
+            order["line"] > self.LOWEST_LINE
         )
 
         if not matched:
@@ -35,6 +59,7 @@ class NCAABTotalSkyHigh(Strategy):
 
         return True
 
+
 class NCAABTotalUnder(Strategy):
     HIGHEST_LINE = 150
     LOWEST_ODDS = -105
@@ -48,13 +73,38 @@ class NCAABTotalUnder(Strategy):
         return stat_type == "total" and league == "ncaab"
 
     def run_match_analysis(self, matches: list, strategy_bot_instance, start_date: str) -> bool:
-        order, metrics = self._get_highest_order_metrics(matches=matches, highest_type="highest_liquidity_difference", highest_order_side="under")
-        if not order or not metrics:
+        pass
+        # order, metrics = self._get_highest_order_metrics(matches=matches, highest_type="highest_liquidity_difference", highest_order_side="under")
+        # if not order or not metrics:
+        #     return False
+        #
+        # matched = (
+        #     metrics["line"] < self.HIGHEST_LINE
+        #     and self.LOWEST_ODDS < metrics["odds"] < self.HIGHEST_ODDS
+        # )
+        #
+        # if not matched:
+        #     return False
+        #
+        #
+        # self.send_message(
+        #     strategy_bot_instance=strategy_bot_instance,
+        #     highest_order=order,
+        #     strategy_type=self.strategy_type,
+        #     start_date=start_date,
+        #     strategy_color=self.STRATEGY_COLOR,
+        #     stat_type="total"
+        # )
+        #
+        # return True
+
+    def run_match_modified_analysis(self, order: dict, strategy_bot_instance, start_date: str) -> bool:
+        if not order:
             return False
 
         matched = (
-            metrics["line"] < self.HIGHEST_LINE
-            and self.LOWEST_ODDS < metrics["odds"] < self.HIGHEST_ODDS
+            order["line"] < self.HIGHEST_LINE
+            and self.LOWEST_ODDS < order["odds"] < self.HIGHEST_ODDS
         )
 
         if not matched:
@@ -86,13 +136,38 @@ class NCAABTotalGoldMine(Strategy):
         return stat_type == "total" and league == "ncaab"
 
     def run_match_analysis(self, matches: list, strategy_bot_instance, start_date: str) -> bool:
-        order, metrics = self._get_highest_order_metrics(matches=matches, highest_type="highest_liquidity_difference")
-        if not order or not metrics:
+        pass
+        # order, metrics = self._get_highest_order_metrics(matches=matches, highest_type="highest_liquidity_difference")
+        # if not order or not metrics:
+        #     return False
+        #
+        # matched = (
+        #     metrics["line"] <= self.HIGHEST_LINE
+        #     and self.LOWEST_ODDS <= metrics["odds"] <= self.HIGHEST_ODDS
+        # )
+        #
+        # if not matched:
+        #     return False
+        #
+        #
+        # self.send_message(
+        #     strategy_bot_instance=strategy_bot_instance,
+        #     highest_order=order,
+        #     strategy_type=self.strategy_type,
+        #     start_date=start_date,
+        #     strategy_color=self.STRATEGY_COLOR,
+        #     stat_type="total"
+        # )
+        #
+        # return True
+
+    def run_match_modified_analysis(self, order: dict, strategy_bot_instance, start_date: str) -> bool:
+        if not order:
             return False
 
         matched = (
-            metrics["line"] <= self.HIGHEST_LINE
-            and self.LOWEST_ODDS <= metrics["odds"] <= self.HIGHEST_ODDS
+            order["line"] <= self.HIGHEST_LINE
+            and self.LOWEST_ODDS <= order["odds"] <= self.HIGHEST_ODDS
         )
 
         if not matched:
@@ -122,12 +197,36 @@ class NCAABTotalLowLine(Strategy):
         return stat_type == "total" and league == "ncaab"
 
     def run_match_analysis(self, matches: list, strategy_bot_instance, start_date: str) -> bool:
-        order, metrics = self._get_highest_order_metrics(matches=matches, highest_type="highest_liquidity_difference")
-        if not order or not metrics:
+        pass
+        # order, metrics = self._get_highest_order_metrics(matches=matches, highest_type="highest_liquidity_difference")
+        # if not order or not metrics:
+        #     return False
+        #
+        # matched = (
+        #     metrics["line"] < self.HIGHEST_LINE
+        # )
+        #
+        # if not matched:
+        #     return False
+        #
+        #
+        # self.send_message(
+        #     strategy_bot_instance=strategy_bot_instance,
+        #     highest_order=order,
+        #     strategy_type=self.strategy_type,
+        #     start_date=start_date,
+        #     strategy_color=self.STRATEGY_COLOR,
+        #     stat_type="total"
+        # )
+        #
+        # return True
+
+    def run_match_modified_analysis(self, order: dict, strategy_bot_instance, start_date: str) -> bool:
+        if not order:
             return False
 
         matched = (
-            metrics["line"] < self.HIGHEST_LINE
+            order["line"] < self.HIGHEST_LINE
         )
 
         if not matched:
@@ -157,13 +256,38 @@ class NCAABTotalOverHighJuice(Strategy):
         return stat_type == "total" and league == "ncaab"
 
     def run_match_analysis(self, matches: list, strategy_bot_instance, start_date: str) -> bool:
-        order, metrics = self._get_highest_order_metrics(matches=matches, highest_type="highest_liquidity_difference", highest_order_side="over")
-        if not order or not metrics:
+        pass
+        # order, metrics = self._get_highest_order_metrics(matches=matches, highest_type="highest_liquidity_difference", highest_order_side="over")
+        # if not order or not metrics:
+        #     return False
+        #
+        # matched = (
+        #
+        #     metrics["odds"] <= self.HIGHEST_ODDS
+        # )
+        #
+        # if not matched:
+        #     return False
+        #
+        #
+        # self.send_message(
+        #     strategy_bot_instance=strategy_bot_instance,
+        #     highest_order=order,
+        #     strategy_type=self.strategy_type,
+        #     start_date=start_date,
+        #     strategy_color=self.STRATEGY_COLOR,
+        #     stat_type="total"
+        # )
+        #
+        # return True
+
+    def run_match_modified_analysis(self, order: dict, strategy_bot_instance, start_date: str) -> bool:
+        if not order:
             return False
 
         matched = (
 
-            metrics["odds"] <= self.HIGHEST_ODDS
+            order["odds"] <= self.HIGHEST_ODDS
         )
 
         if not matched:

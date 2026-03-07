@@ -87,7 +87,6 @@ class StrategyDiscordBot:
         snapshot_time = order_details.get('pacific_snapshot') if order_details.get('pacific_snapshot') else None
         if snapshot_time:
             snapshot_time = snapshot_time.strftime("%H:%M")
-            print(snapshot_time)
 
         fields.append({
             "name": "Liquidity Quick Summary",

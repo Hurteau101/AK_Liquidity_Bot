@@ -24,13 +24,6 @@ STRATEGIES = {
         NBATotalEliteOver(),
         NBATotalTrueSilverUnder(),
         NBATotalSilverUnder()
-    ],
-    "NCAAB": [
-        NCAABTotalSkyHigh(),
-        NCAABTotalUnder(),
-        NCAABTotalGoldMine(),
-        NCAABTotalLowLine(),
-        NCAABTotalOverHighJuice(),
     ]
 }
 
