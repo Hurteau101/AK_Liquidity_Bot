@@ -102,6 +102,7 @@ class ProcessManager:
                 "under_outcome_id": player.get("liquidity", {}).get("under", {}).get("highest_order", {}).get("outcome_id"),
                 "start_date": player.get("additional_data", {}).get("game_start_time"),
                 "league": league,
+                "stat_type": player.get("additional_data", {}).get("stat_type"),
 
             }
 
