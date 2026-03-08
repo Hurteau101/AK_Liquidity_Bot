@@ -81,6 +81,34 @@ class ProcessManager:
                 break  # Break since then a message was sent.
 
 
+    def run_checker_strategy_checker(self, player, redis_strategy_sent_instance: Redis, start_date_dt: datetime,
+                                     player_key: str, highest, league, player_liquidity_difference, strategy_bot: StrategyDiscordBot):
+
+        if league == "NCAAB" and player.get("additional_data", {}).get("stat_type").lower() == "total":
+            already_sent = redis_strategy_sent_instance.exists(player_key)
+            if already_sent:
+                return
+
+            order = {
+                "odds": highest.get("american_price"),
+                "line": player.get("additional_data", {}).get("line"),
+                "liquidity_highest_order": highest.get("liquidity_left"),
+                "total_over_liquidity": player.get("liquidity", {}).get("over", {}).get("highest_order", {}).get("total_liquidity"),
+                "total_under_liquidity": player.get("liquidity", {}).get("under", {}).get("highest_order", {}).get("total_liquidity"),
+                "highest_order_side": highest.get("side"),
+                "liquidity_difference": player_liquidity_difference,
+                "odds_highest_order": highest.get("american_price"),
+                "over_outcome_id": player.get("liquidity", {}).get("over", {}).get("highest_order", {}).get("outcome_id"),
+                "under_outcome_id": player.get("liquidity", {}).get("under", {}).get("highest_order", {}).get("outcome_id"),
+                "start_date": player.get("additional_data", {}).get("game_start_time"),
+                "league": league,
+
+            }
+
+
+            self.check_strategy_ncaab(order=order, redis_strategy_sent_instance=redis_strategy_sent_instance,
+                                      start_date=start_date_dt, key=player_key, strategy_bot_instance=strategy_bot)
+
     def manger(self, player_data, league):
         if not player_data or not league:
             return
@@ -131,6 +159,11 @@ class ProcessManager:
                 self.store_player(pipeline=pipeline, player_key=player_key, mapping_data=mapping_data,start_time_dt=start_date_dt_plus_buffer)
                 self.discord_bot.discord_message(player, market_changed=False)
 
+                self.run_checker_strategy_checker(player=player, redis_strategy_sent_instance=redis_strategy_sent_instance,
+                                                  start_date_dt=start_date_dt, player_key=player_key, highest=highest,
+                                                  league=league, player_liquidity_difference=player_liquidity_difference,
+                                                  strategy_bot=strategy_bot)
+
                 if is_production:
                     db.insert_data(player, league, self.market_type)
 
@@ -144,30 +177,14 @@ class ProcessManager:
                 self.store_player(pipeline=pipeline, player_key=player_key, mapping_data=mapping_data, start_time_dt=start_date_dt)
                 self.discord_bot.discord_message(player, market_changed=True)
 
+
+                self.run_checker_strategy_checker(player=player, redis_strategy_sent_instance=redis_strategy_sent_instance,
+                                                  start_date_dt=start_date_dt, player_key=player_key, highest=highest,
+                                                  league=league, player_liquidity_difference=player_liquidity_difference,
+                                                  strategy_bot=strategy_bot)
+
                 if is_production:
                     db.insert_data(player, league, self.market_type)
 
 
-            if league == "NCAAB" and player.get("additional_data", {}).get("stat_type").lower() == "total":
-                already_sent = redis_strategy_sent_instance.exists(player_key)
-                if already_sent:
-                    continue
 
-                order = {
-                    "odds": highest.get("american_price"),
-                    "line": player.get("additional_data", {}).get("line"),
-                    "liquidity_highest_order": highest.get("liquidity_left"),
-                    "total_over_liquidity": player.get("liquidity", {}).get("over", {}).get("total_liquidity"),
-                    "total_under_liquidity": player.get("liquidity", {}).get("under", {}).get("total_liquidity"),
-                    "highest_order_side": highest.get("side"),
-                    "liquidity_difference": player_liquidity_difference,
-                    "over_outcome_id": player.get("liquidity", {}).get("over", {}).get("outcome_id"),
-                    "under_outcome_id": player.get("liquidity", {}).get("under", {}).get("outcome_id"),
-                    "start_date": player.get("additional_data", {}).get("game_start_time"),
-                    "league": league,
-
-                }
-
-
-                self.check_strategy_ncaab(order=order, redis_strategy_sent_instance=redis_strategy_sent_instance,
-                                          start_date=start_date_dt, key=player_key, strategy_bot_instance=strategy_bot)
