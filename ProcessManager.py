@@ -103,8 +103,10 @@ class ProcessManager:
                 "start_date": player.get("additional_data", {}).get("game_start_time"),
                 "league": league,
                 "stat_type": player.get("additional_data", {}).get("stat_type"),
+                "game_title": player.get("additional_data", {}).get("game_title"),
 
             }
+
 
 
             self.check_strategy_ncaab(order=order, redis_strategy_sent_instance=redis_strategy_sent_instance,
