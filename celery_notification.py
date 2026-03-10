@@ -20,7 +20,8 @@ celery_app.conf.beat_schedule = {
     },
     "update_results": {
         "task": "celery_notification.update_results",
-        "schedule": timedelta(hours=12),
+        # "schedule": timedelta(hours=12),
+        "schedule": timedelta(minutes=1),
     }
 }
 
