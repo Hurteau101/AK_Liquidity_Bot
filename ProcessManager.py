@@ -107,8 +107,6 @@ class ProcessManager:
 
             }
 
-
-
             self.check_strategy_ncaab(order=order, redis_strategy_sent_instance=redis_strategy_sent_instance,
                                       start_date=start_date_dt, key=player_key, strategy_bot_instance=strategy_bot)
 

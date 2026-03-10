@@ -41,7 +41,9 @@ class NCAABTotalSkyHigh(Strategy):
             return False
 
         matched = (
-            order["line"] > self.LOWEST_LINE
+            order["highest_order_side"] == "over"
+            and order["line"] > self.LOWEST_LINE
+
         )
 
         if not matched:
