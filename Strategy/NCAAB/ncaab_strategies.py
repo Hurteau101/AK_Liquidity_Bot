@@ -105,7 +105,8 @@ class NCAABTotalUnder(Strategy):
             return False
 
         matched = (
-            order["line"] < self.HIGHEST_LINE
+            order["highest_order_side"] == "under"
+            and order["line"] < self.HIGHEST_LINE
             and self.LOWEST_ODDS < order["odds"] < self.HIGHEST_ODDS
         )
 
@@ -288,8 +289,8 @@ class NCAABTotalOverHighJuice(Strategy):
             return False
 
         matched = (
-
-            order["odds"] <= self.HIGHEST_ODDS
+            order["highest_order_side"] == "over"
+            and order["odds"] <= self.HIGHEST_ODDS
         )
 
         if not matched:
