@@ -13,6 +13,7 @@ class Strategy(ABC):
 
         metrics = {
             "odds": float(order.get("odds_highest_order", 0)),
+            "highest_order_side": order.get("highest_order_side", ""),
             "highest_order_liquidity": float(order.get("liquidity_highest_order", 0)),
             "liquidity_difference": float(order.get("liquidity_difference", 0)),
             "is_favorite": "-" in str(order.get("highest_order_side", "")) if check_favourite else False,
@@ -41,13 +42,14 @@ class Strategy(ABC):
         if highest_type == "highest_order":
             return max(matches, key=lambda x: x["liquidity_highest_order"], default=None)
 
-        filtered_matches = (
-            (match for match in matches if match.get("highest_order_side") == highest_order_side)
-            if highest_order_side is not None
-            else matches
-        )
+        # filtered_matches = (
+        #     (match for match in matches if match.get("highest_order_side") == highest_order_side)
+        #     if highest_order_side is not None
+        #     else matches
+        # )
 
-        return max(filtered_matches, key=lambda x: x["liquidity_difference"], default=None)
+        # return max(filtered_matches, key=lambda x: x["liquidity_difference"], default=None)
+        return max(matches, key=lambda x: x["liquidity_difference"], default=None)
 
 
 

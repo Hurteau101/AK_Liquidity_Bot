@@ -17,7 +17,8 @@ class NCAABTotalSkyHigh(Strategy):
             return False
 
         matched = (
-            metrics["line"] > self.LOWEST_LINE
+            metrics["highest_order_side"] == "over"
+            and metrics["line"] > self.LOWEST_LINE
         )
 
         if not matched:
@@ -53,7 +54,8 @@ class NCAABTotalUnder(Strategy):
             return False
 
         matched = (
-            metrics["line"] < self.HIGHEST_LINE
+            metrics["highest_order_side"] == "under"
+            and metrics["line"] < self.HIGHEST_LINE
             and self.LOWEST_ODDS < metrics["odds"] < self.HIGHEST_ODDS
         )
 
@@ -162,8 +164,8 @@ class NCAABTotalOverHighJuice(Strategy):
             return False
 
         matched = (
-
-            metrics["odds"] <= self.HIGHEST_ODDS
+            metrics["highest_order_side"] == "over"
+            and metrics["odds"] <= self.HIGHEST_ODDS
         )
 
         if not matched:

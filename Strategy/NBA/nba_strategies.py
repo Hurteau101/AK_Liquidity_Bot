@@ -314,7 +314,8 @@ class NBATotalGoldUnder(Strategy):
             return False
 
         matched = (
-            metrics["liquidity_difference"] >= self.LOWEST_LIQUIDITY_DIFFERENCE
+            metrics["highest_order_side"] == "under"
+            and metrics["liquidity_difference"] >= self.LOWEST_LIQUIDITY_DIFFERENCE
             and metrics["odds"] >= self.LOWEST_ODDS
         )
 
@@ -350,7 +351,8 @@ class NBATotalPlatinumUnder(Strategy):
             return False
 
         matched = (
-            metrics["liquidity_difference"] >= self.LOWEST_LIQUIDITY_DIFFERENCE
+            metrics["highest_order_side"] == "under"
+            and metrics["liquidity_difference"] >= self.LOWEST_LIQUIDITY_DIFFERENCE
             and metrics["line"] >= self.LOWEST_LINE
         )
 
@@ -382,12 +384,14 @@ class NBATotalEliteOver(Strategy):
 
     def run_match_analysis(self, matches: list, strategy_bot_instance, start_date: str) -> bool:
         order, metrics = self._get_highest_order_metrics(matches=matches, highest_type="highest_liquidity_difference", highest_order_side="over")
+        print(order)
 
         if not order or not metrics:
             return False
 
         matched = (
-            metrics["liquidity_difference"] >= self.LOWEST_LIQUIDITY_DIFFERENCE
+            metrics["highest_order_side"] == "over"
+            and metrics["liquidity_difference"] >= self.LOWEST_LIQUIDITY_DIFFERENCE
             and metrics["line"] >= self.LOWEST_LINE
             and metrics["odds"] >= self.LOWEST_ODDS
         )
@@ -424,7 +428,8 @@ class NBATotalSilverUnder(Strategy):
             return False
 
         matched = (
-            self.LOWEST_LIQUIDITY_DIFFERENCE <= metrics["liquidity_difference"] <= self.HIGHEST_LIQUIDITY_DIFFERENCE
+            metrics["highest_order_side"] == "under"
+            and self.LOWEST_LIQUIDITY_DIFFERENCE <= metrics["liquidity_difference"] <= self.HIGHEST_LIQUIDITY_DIFFERENCE
         )
 
         if not matched:
@@ -470,7 +475,8 @@ class NBATotalTrueSilverUnder(Strategy):
         modified_start_date_dt = pacific_start_dt - timedelta(minutes=self.MINUTES_FROM_GAME_START)
 
         matched = (
-            self.LOWEST_LIQUIDITY_DIFFERENCE <= metrics["liquidity_difference"] <= self.HIGHEST_LIQUIDITY_DIFFERENCE
+            metrics["highest_order_side"] == "under"
+            and self.LOWEST_LIQUIDITY_DIFFERENCE <= metrics["liquidity_difference"] <= self.HIGHEST_LIQUIDITY_DIFFERENCE
             and metrics["line"] <= self.HIGHEST_LINE
             and modified_start_date_dt <= snapshot_time_pacific <= pacific_start_dt
         )
