@@ -136,6 +136,9 @@ class ProcessManager:
             if highest.get("cost_avg_odds") >= 250:
                 continue
 
+            if league == "NCAAB" and self.market_type == "mainlines" and highest.get("cost_avg_odds") > 150:
+                continue
+
             player_key = player.get("key_name")
             redis_current_diff = self.get_liquidity_difference(player_key)
 
