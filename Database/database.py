@@ -270,22 +270,28 @@ class Database:
 
     def controller(self, liquidity_context: LiquidityContext):
         def is_moneyline_or_spread(listed_stat_type):
-            if listed_stat_type in ["Moneyline", "Spread"]:
-                return True
-            return False
+            return listed_stat_type in ["Moneyline", "Spread"]
+
+        def get_side_data(side_name):
+            order = liquidity_context.main_liquidity.get(side_name, {}).get("highest_order", {})
+            return order.get("total_liquidity"), order.get("outcome_id")
 
         table_name = "novig_tracking" if self.is_production else "novig_tracking_test_environment"
 
-        side_1_name = liquidity_context.side_1_name
-        side_2_name = liquidity_context.side_2_name
-
-        side_1_order = liquidity_context.main_liquidity.get(side_1_name, {}).get("highest_order", {}).get("total_liquidity")
-        side_2_order = liquidity_context.main_liquidity.get(side_2_name, {}).get("highest_order", {}).get("total_liquidity")
-
-        side_1_outcome_id = liquidity_context.main_liquidity.get(side_1_name, {}).get("highest_order", {}).get("outcome_id")
-        side_2_outcome_id = liquidity_context.main_liquidity.get(side_2_name, {}).get("highest_order", {}).get("outcome_id")
-
-        stat_type = liquidity_context.additional_data.get("stat_type", None)
+        stat_type = liquidity_context.additional_data.get("stat_type", "")
+        is_over_under = not is_moneyline_or_spread(stat_type)
+        if is_over_under:
+            over_name = next((k for k in liquidity_context.main_liquidity if k.lower().startswith("over")), None)
+            under_name = next((k for k in liquidity_context.main_liquidity if k.lower().startswith("under")), None)
+            over_liquidity, over_outcome_id = get_side_data(over_name)
+            under_liquidity, under_outcome_id = get_side_data(under_name)
+            side_1_name, side_2_name, side_1_order, side_2_order, side_1_outcome_id,side_2_outcome_id  = None, None, None, None, None, None
+        else:
+            over_liquidity, under_liquidity, over_outcome_id, under_outcome_id = None, None, None, None
+            side_1_name = liquidity_context.side_1_name
+            side_2_name = liquidity_context.side_2_name
+            side_1_order, side_1_outcome_id = get_side_data(side_1_name)
+            side_2_order, side_2_outcome_id = get_side_data(side_2_name)
 
         storable_data = {
             "player_name": liquidity_context.additional_data.get("player_name", None),
@@ -293,22 +299,22 @@ class Database:
             "line": liquidity_context.additional_data.get("line", None),
             "game_title": liquidity_context.additional_data.get("game_title", None),
             "game_start_time": liquidity_context.additional_data.get("game_start_time", None),
-            "total_over_liquidity": side_1_order if not is_moneyline_or_spread(stat_type) else None,
-            "total_under_liquidity": side_2_order if not is_moneyline_or_spread(stat_type) else None,
+            "total_over_liquidity": over_liquidity,
+            "total_under_liquidity": under_liquidity,
             "highest_order_side": liquidity_context.highest_order.get("side"),
             "liquidity_highest_order": liquidity_context.highest_order.get("liquidity_left"),
             "odds_highest_order": liquidity_context.highest_order.get("american_price"),
             "liquidity_difference": liquidity_context.liquidity_difference,
             "league": liquidity_context.league,
-            "over_outcome_id": side_1_outcome_id if not is_moneyline_or_spread(stat_type) else None,
-            "under_outcome_id": side_2_outcome_id if not is_moneyline_or_spread(stat_type) else None,
+            "over_outcome_id": over_outcome_id,
+            "under_outcome_id": under_outcome_id,
             "market_type": liquidity_context.market_type,
-            "type_team_1_name": side_1_name if is_moneyline_or_spread(stat_type) else None,
-            "type_team_2_name": side_2_name if is_moneyline_or_spread(stat_type) else None,
-            "type_team_1_total_liquidity": side_1_order if is_moneyline_or_spread(stat_type) else None,
-            "type_team_2_total_liquidity": side_2_order if is_moneyline_or_spread(stat_type) else None,
-            "type_team_1_outcome_id": side_1_outcome_id if is_moneyline_or_spread(stat_type) else None,
-            "type_team_2_outcome_id": side_2_outcome_id if is_moneyline_or_spread(stat_type) else None,
+            "type_team_1_name": side_1_name,
+            "type_team_2_name": side_2_name,
+            "type_team_1_total_liquidity": side_1_order,
+            "type_team_2_total_liquidity": side_2_order,
+            "type_team_1_outcome_id": side_1_outcome_id,
+            "type_team_2_outcome_id": side_2_outcome_id,
             "liquidity_context": json.dumps(asdict(liquidity_context), default=str)
         }
 
