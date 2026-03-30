@@ -3,6 +3,7 @@ from collections import defaultdict
 from datetime import timedelta
 from celery import Celery
 from Database.database import Database
+from novg_results import Results
 from runner import Runner
 
 celery_app = Celery(
