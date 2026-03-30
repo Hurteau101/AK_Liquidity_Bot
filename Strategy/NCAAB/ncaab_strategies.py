@@ -1,4 +1,7 @@
+from dataclasses import asdict
+
 from Strategy.strategy import Strategy
+from liqudity_context import LiquidityContext, LiquidityStrategy
 
 
 class NCAABTotalSkyHigh(Strategy):
@@ -11,56 +14,24 @@ class NCAABTotalSkyHigh(Strategy):
     def part_of_strategy(self, stat_type: str, league: str) -> bool:
         return stat_type == "total" and league == "ncaab"
 
-    def run_match_analysis(self, matches: list, strategy_bot_instance, start_date: str) -> bool:
-        pass
-        # order, metrics = self._get_highest_order_metrics(matches=matches, highest_type="highest_liquidity_difference", highest_order_side="over")
-        # if not order or not metrics:
-        #     return False
-        #
-        # matched = (
-        #     metrics["line"] > self.LOWEST_LINE
-        # )
-        #
-        # if not matched:
-        #     return False
-        #
-        #
-        # self.send_message(
-        #     strategy_bot_instance=strategy_bot_instance,
-        #     highest_order=order,
-        #     strategy_type=self.strategy_type,
-        #     start_date=start_date,
-        #     strategy_color=self.STRATEGY_COLOR,
-        #     stat_type="total"
-        # )
-        #
-        # return True
-
-    def run_match_modified_analysis(self, order: dict, strategy_bot_instance, start_date: str) -> bool:
-        if not order:
+    def run_match_analysis(self, liquidity_context: LiquidityContext, strategy_bot_instance) -> bool:
+        if not liquidity_context:
             return False
 
         matched = (
-            order["highest_order_side"] == "over"
-            and order["line"] > self.LOWEST_LINE
-
+            liquidity_context.highest_order.get("side", '') == "over"
+            and liquidity_context.additional_data.get("line", 0) > self.LOWEST_LINE
         )
 
         if not matched:
             return False
 
+        liquidity_context.strategy.strategy_name = self.strategy_type
+        liquidity_context.strategy.discord_color = self.STRATEGY_COLOR
 
-        self.send_message(
-            strategy_bot_instance=strategy_bot_instance,
-            highest_order=order,
-            strategy_type=self.strategy_type,
-            start_date=start_date,
-            strategy_color=self.STRATEGY_COLOR,
-            stat_type="total"
-        )
+        self.send_message(strategy_bot_instance=strategy_bot_instance, liquidity_context=liquidity_context)
 
         return True
-
 
 class NCAABTotalUnder(Strategy):
     HIGHEST_LINE = 150
@@ -74,57 +45,25 @@ class NCAABTotalUnder(Strategy):
     def part_of_strategy(self, stat_type: str, league: str) -> bool:
         return stat_type == "total" and league == "ncaab"
 
-    def run_match_analysis(self, matches: list, strategy_bot_instance, start_date: str) -> bool:
-        pass
-        # order, metrics = self._get_highest_order_metrics(matches=matches, highest_type="highest_liquidity_difference", highest_order_side="under")
-        # if not order or not metrics:
-        #     return False
-        #
-        # matched = (
-        #     metrics["line"] < self.HIGHEST_LINE
-        #     and self.LOWEST_ODDS < metrics["odds"] < self.HIGHEST_ODDS
-        # )
-        #
-        # if not matched:
-        #     return False
-        #
-        #
-        # self.send_message(
-        #     strategy_bot_instance=strategy_bot_instance,
-        #     highest_order=order,
-        #     strategy_type=self.strategy_type,
-        #     start_date=start_date,
-        #     strategy_color=self.STRATEGY_COLOR,
-        #     stat_type="total"
-        # )
-        #
-        # return True
-
-    def run_match_modified_analysis(self, order: dict, strategy_bot_instance, start_date: str) -> bool:
-        if not order:
+    def run_match_analysis(self, liquidity_context: LiquidityContext, strategy_bot_instance) -> bool:
+        if not liquidity_context:
             return False
 
         matched = (
-            order["highest_order_side"] == "under"
-            and order["line"] < self.HIGHEST_LINE
-            and self.LOWEST_ODDS < order["odds"] < self.HIGHEST_ODDS
+            liquidity_context.highest_order.get("side", '') == "under"
+            and liquidity_context.additional_data.get("line", 0) < self.HIGHEST_LINE
+            and self.LOWEST_ODDS < liquidity_context.highest_order.get("american_price", 0) < self.HIGHEST_ODDS
         )
 
         if not matched:
             return False
 
+        liquidity_context.strategy.strategy_name = self.strategy_type
+        liquidity_context.strategy.discord_color = self.STRATEGY_COLOR
 
-        self.send_message(
-            strategy_bot_instance=strategy_bot_instance,
-            highest_order=order,
-            strategy_type=self.strategy_type,
-            start_date=start_date,
-            strategy_color=self.STRATEGY_COLOR,
-            stat_type="total"
-        )
+        self.send_message(strategy_bot_instance=strategy_bot_instance, liquidity_context=liquidity_context)
 
         return True
-
 
 class NCAABTotalGoldMine(Strategy):
     HIGHEST_LINE = 150
@@ -138,53 +77,22 @@ class NCAABTotalGoldMine(Strategy):
     def part_of_strategy(self, stat_type: str, league: str) -> bool:
         return stat_type == "total" and league == "ncaab"
 
-    def run_match_analysis(self, matches: list, strategy_bot_instance, start_date: str) -> bool:
-        pass
-        # order, metrics = self._get_highest_order_metrics(matches=matches, highest_type="highest_liquidity_difference")
-        # if not order or not metrics:
-        #     return False
-        #
-        # matched = (
-        #     metrics["line"] <= self.HIGHEST_LINE
-        #     and self.LOWEST_ODDS <= metrics["odds"] <= self.HIGHEST_ODDS
-        # )
-        #
-        # if not matched:
-        #     return False
-        #
-        #
-        # self.send_message(
-        #     strategy_bot_instance=strategy_bot_instance,
-        #     highest_order=order,
-        #     strategy_type=self.strategy_type,
-        #     start_date=start_date,
-        #     strategy_color=self.STRATEGY_COLOR,
-        #     stat_type="total"
-        # )
-        #
-        # return True
-
-    def run_match_modified_analysis(self, order: dict, strategy_bot_instance, start_date: str) -> bool:
-        if not order:
+    def run_match_analysis(self, liquidity_context: LiquidityContext, strategy_bot_instance) -> bool:
+        if not liquidity_context:
             return False
 
         matched = (
-            order["line"] <= self.HIGHEST_LINE
-            and self.LOWEST_ODDS <= order["odds"] <= self.HIGHEST_ODDS
+            liquidity_context.additional_data.get("line", 0) <= self.HIGHEST_LINE
+            and self.LOWEST_ODDS <= liquidity_context.highest_order.get("american_price", 0) <= self.HIGHEST_ODDS
         )
 
         if not matched:
             return False
 
+        liquidity_context.strategy.strategy_name = self.strategy_type
+        liquidity_context.strategy.discord_color = self.STRATEGY_COLOR
 
-        self.send_message(
-            strategy_bot_instance=strategy_bot_instance,
-            highest_order=order,
-            strategy_type=self.strategy_type,
-            start_date=start_date,
-            strategy_color=self.STRATEGY_COLOR,
-            stat_type="total"
-        )
+        self.send_message(strategy_bot_instance=strategy_bot_instance, liquidity_context=liquidity_context)
 
         return True
 
@@ -199,51 +107,21 @@ class NCAABTotalLowLine(Strategy):
     def part_of_strategy(self, stat_type: str, league: str) -> bool:
         return stat_type == "total" and league == "ncaab"
 
-    def run_match_analysis(self, matches: list, strategy_bot_instance, start_date: str) -> bool:
-        pass
-        # order, metrics = self._get_highest_order_metrics(matches=matches, highest_type="highest_liquidity_difference")
-        # if not order or not metrics:
-        #     return False
-        #
-        # matched = (
-        #     metrics["line"] < self.HIGHEST_LINE
-        # )
-        #
-        # if not matched:
-        #     return False
-        #
-        #
-        # self.send_message(
-        #     strategy_bot_instance=strategy_bot_instance,
-        #     highest_order=order,
-        #     strategy_type=self.strategy_type,
-        #     start_date=start_date,
-        #     strategy_color=self.STRATEGY_COLOR,
-        #     stat_type="total"
-        # )
-        #
-        # return True
-
-    def run_match_modified_analysis(self, order: dict, strategy_bot_instance, start_date: str) -> bool:
-        if not order:
+    def run_match_analysis(self, liquidity_context: LiquidityContext, strategy_bot_instance) -> bool:
+        if not liquidity_context:
             return False
 
         matched = (
-            order["line"] < self.HIGHEST_LINE
+            liquidity_context.additional_data.get("line", 0) < self.HIGHEST_LINE
         )
 
         if not matched:
             return False
 
+        liquidity_context.strategy.strategy_name = self.strategy_type
+        liquidity_context.strategy.discord_color = self.STRATEGY_COLOR
 
-        self.send_message(
-            strategy_bot_instance=strategy_bot_instance,
-            highest_order=order,
-            strategy_type=self.strategy_type,
-            start_date=start_date,
-            strategy_color=self.STRATEGY_COLOR,
-            stat_type="total"
-        )
+        self.send_message(strategy_bot_instance=strategy_bot_instance, liquidity_context=liquidity_context)
 
         return True
 
@@ -258,52 +136,21 @@ class NCAABTotalOverHighJuice(Strategy):
     def part_of_strategy(self, stat_type: str, league: str) -> bool:
         return stat_type == "total" and league == "ncaab"
 
-    def run_match_analysis(self, matches: list, strategy_bot_instance, start_date: str) -> bool:
-        pass
-        # order, metrics = self._get_highest_order_metrics(matches=matches, highest_type="highest_liquidity_difference", highest_order_side="over")
-        # if not order or not metrics:
-        #     return False
-        #
-        # matched = (
-        #
-        #     metrics["odds"] <= self.HIGHEST_ODDS
-        # )
-        #
-        # if not matched:
-        #     return False
-        #
-        #
-        # self.send_message(
-        #     strategy_bot_instance=strategy_bot_instance,
-        #     highest_order=order,
-        #     strategy_type=self.strategy_type,
-        #     start_date=start_date,
-        #     strategy_color=self.STRATEGY_COLOR,
-        #     stat_type="total"
-        # )
-        #
-        # return True
-
-    def run_match_modified_analysis(self, order: dict, strategy_bot_instance, start_date: str) -> bool:
-        if not order:
+    def run_match_analysis(self, liquidity_context: LiquidityContext, strategy_bot_instance) -> bool:
+        if not liquidity_context:
             return False
 
         matched = (
-            order["highest_order_side"] == "over"
-            and order["odds"] <= self.HIGHEST_ODDS
+            liquidity_context.highest_order.get("side", '') == "over"
+            and liquidity_context.highest_order.get("american_price", 0) <= self.HIGHEST_ODDS
         )
 
         if not matched:
             return False
 
+        liquidity_context.strategy.strategy_name = self.strategy_type
+        liquidity_context.strategy.discord_color = self.STRATEGY_COLOR
 
-        self.send_message(
-            strategy_bot_instance=strategy_bot_instance,
-            highest_order=order,
-            strategy_type=self.strategy_type,
-            start_date=start_date,
-            strategy_color=self.STRATEGY_COLOR,
-            stat_type="total"
-        )
+        self.send_message(strategy_bot_instance=strategy_bot_instance, liquidity_context=liquidity_context)
 
         return True

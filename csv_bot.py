@@ -72,10 +72,10 @@ class CSV_Bot(commands.Cog):
             'game_title AS "Game Title"',
             'total_over_liquidity AS "Total Over Liquidity"',
             'total_under_liquidity AS "Total Under Liquidity"',
-            'spread_team_1_name AS "Spread Team 1 Name"',
-            'spread_team_2_name AS "Spread Team 2 Name"',
-            'spread_team_1_total_liquidity AS "Spread Team 1 Total Liquidity"',
-            'spread_team_2_total_liquidity AS "Spread Team 2 Total Liquidity"',
+            'type_team_1_name AS "Type Team 1 Name"',
+            'type_team_2_name AS "Type Team 2 Name"',
+            'type_team_1_total_liquidity AS "Type Team 1 Total Liquidity"',
+            'type_team_2_total_liquidity AS "Type Team 2 Total Liquidity"',
             'highest_order_side AS "Highest Order Side"',
             'liquidity_highest_order AS "Highest Order Liquidity"',
             'odds_highest_order AS "Highest Order Odds"',
@@ -86,11 +86,11 @@ class CSV_Bot(commands.Cog):
             'market_type AS "Market Type"',
         ]
 
-        # Only include Player Name if NOT mainlines and Spread Result if mainlines
+        # Only include Player Name if NOT mainlines and Type Result if mainlines
         if market_type != "mainlines":
             base_columns.insert(1, 'player_name AS "Player Name"')
         else:
-            base_columns.insert(-1, 'spread_result AS "Spread Result"')
+            base_columns.insert(-1, 'type_result AS "Type Result"')
 
 
         columns = ",\n       ".join(base_columns)

@@ -2,7 +2,8 @@ from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
 from Strategy.strategy import Strategy
-from discord_sender import DiscordBot
+from liqudity_context import LiquidityContext
+
 
 class NBASpreadSniper(Strategy):
     LOWEST_ODDS = -110
@@ -20,31 +21,26 @@ class NBASpreadSniper(Strategy):
     def part_of_strategy(self, stat_type: str, league: str) -> bool:
         return stat_type == "spread" and league == "nba"
 
-    def run_match_analysis(self, matches: list, strategy_bot_instance, start_date: str) -> bool:
-        order, metrics = self._get_highest_order_metrics(matches=matches, check_favourite=True)
+    def run_match_analysis(self, liquidity_context: list[LiquidityContext], strategy_bot_instance) -> bool:
+        liquidity_context_data = self.get_highest_order(liquidity_contexts=liquidity_context)
 
-        if not order or not metrics:
+        if not liquidity_context_data:
             return False
 
         matched = (
-            metrics["is_favorite"]
-            and self.LOWEST_ODDS <= metrics["odds"] <= self.HIGHEST_ODDS
-            and self.LOWEST_HIGHEST_ORDER <= metrics["highest_order_liquidity"] <= self.HIGHEST_HIGHEST_ORDER
-            and self.LOWEST_LIQUIDITY_DIFFERENCE <= metrics["liquidity_difference"] <= self.HIGHEST_LIQUIDITY_DIFFERENCE
+            self.is_favorite(highest_order_side=liquidity_context_data.highest_order.get("side", ''))
+            and self.LOWEST_ODDS <= liquidity_context_data.highest_order.get("american_price", 0) <= self.HIGHEST_ODDS
+            and self.LOWEST_HIGHEST_ORDER <= liquidity_context_data.highest_order.get("liquidity_left") <= self.HIGHEST_HIGHEST_ORDER
+            and self.LOWEST_LIQUIDITY_DIFFERENCE <= liquidity_context_data.liquidity_difference <= self.HIGHEST_LIQUIDITY_DIFFERENCE
         )
 
         if not matched:
             return False
 
+        liquidity_context_data.strategy.strategy_name = self.strategy_type
+        liquidity_context_data.strategy.discord_color = self.STRATEGY_COLOR
 
-        self.send_message(
-            strategy_bot_instance=strategy_bot_instance,
-            highest_order=order,
-            strategy_type=self.strategy_type,
-            start_date=start_date,
-            strategy_color=self.STRATEGY_COLOR,
-            stat_type="spread"
-        )
+        self.send_message(strategy_bot_instance=strategy_bot_instance, liquidity_context=liquidity_context_data)
 
         return True
 
@@ -65,31 +61,29 @@ class NBASpreadExecutive(Strategy):
     def part_of_strategy(self, stat_type: str, league: str) -> bool:
         return stat_type == "spread" and league == "nba"
 
-    def run_match_analysis(self, matches: list, strategy_bot_instance, start_date: str) -> bool:
-        order, metrics = self._get_highest_order_metrics(matches)
+    def run_match_analysis(self, liquidity_context: list[LiquidityContext], strategy_bot_instance) -> bool:
+        liquidity_context_data = self.get_highest_order(liquidity_contexts=liquidity_context)
 
-        if not order or not metrics:
+        if not liquidity_context_data:
             return False
 
+
         matched = (
-                self.LOWEST_ODDS <= metrics["odds"] <= self.HIGHEST_ODDS
-                and self.LOWEST_HIGHEST_ORDER <= metrics["highest_order_liquidity"] <= self.HIGHEST_HIGHEST_ORDER
-                and self.LOWEST_LIQUIDITY_DIFFERENCE <= metrics["liquidity_difference"] <= self.HIGHEST_LIQUIDITY_DIFFERENCE
+                self.LOWEST_ODDS <= liquidity_context_data.highest_order.get("american_price", 0) <= self.HIGHEST_ODDS
+                and self.LOWEST_HIGHEST_ORDER <= liquidity_context_data.highest_order.get("liquidity_left", 0) <= self.HIGHEST_HIGHEST_ORDER
+                and self.LOWEST_LIQUIDITY_DIFFERENCE <= liquidity_context_data.liquidity_difference <= self.HIGHEST_LIQUIDITY_DIFFERENCE
         )
 
         if not matched:
             return False
 
-        self.send_message(
-            strategy_bot_instance=strategy_bot_instance,
-            highest_order=order,
-            strategy_type=self.strategy_type,
-            start_date=start_date,
-            strategy_color=self.STRATEGY_COLOR,
-            stat_type="spread"
-        )
+        liquidity_context_data.strategy.strategy_name = self.strategy_type
+        liquidity_context_data.strategy.discord_color = self.STRATEGY_COLOR
+
+        self.send_message(strategy_bot_instance=strategy_bot_instance, liquidity_context=liquidity_context_data)
 
         return True
+
 
 class NBASpreadVolumeFavorites(Strategy):
     LOWEST_ODDS = -125
@@ -105,29 +99,25 @@ class NBASpreadVolumeFavorites(Strategy):
     def part_of_strategy(self, stat_type: str, league: str) -> bool:
         return stat_type == "spread" and league == "nba"
 
-    def run_match_analysis(self, matches: list, strategy_bot_instance, start_date: str) -> bool:
-        order, metrics = self._get_highest_order_metrics(matches, check_favourite=True)
+    def run_match_analysis(self, liquidity_context: list[LiquidityContext], strategy_bot_instance) -> bool:
+        liquidity_context_data = self.get_highest_order(liquidity_contexts=liquidity_context)
 
-        if not order or not metrics:
+        if not liquidity_context_data:
             return False
 
         matched = (
-            metrics["is_favorite"]
-            and self.LOWEST_ODDS <= metrics["odds"] <= self.HIGHEST_ODDS
-            and self.LOWEST_HIGHEST_ORDER <= metrics["highest_order_liquidity"] <= self.HIGHEST_HIGHEST_ORDER
+                self.is_favorite(highest_order_side=liquidity_context_data.highest_order.get("side", ''))
+                and self.LOWEST_ODDS <= liquidity_context_data.highest_order.get("american_price", 0) <= self.HIGHEST_ODDS
+                and self.LOWEST_HIGHEST_ORDER <= liquidity_context_data.highest_order.get("liquidity_left", 0) <= self.HIGHEST_HIGHEST_ORDER
         )
 
         if not matched:
             return False
 
-        self.send_message(
-            strategy_bot_instance=strategy_bot_instance,
-            highest_order=order,
-            strategy_type=self.strategy_type,
-            start_date=start_date,
-            strategy_color=self.STRATEGY_COLOR,
-            stat_type="spread"
-        )
+        liquidity_context_data.strategy.strategy_name = self.strategy_type
+        liquidity_context_data.strategy.discord_color = self.STRATEGY_COLOR
+
+        self.send_message(strategy_bot_instance=strategy_bot_instance, liquidity_context=liquidity_context_data)
 
         return True
 
@@ -146,28 +136,24 @@ class NBASpreadVolume(Strategy):
     def part_of_strategy(self, stat_type: str, league: str) -> bool:
         return stat_type == "spread" and league == "nba"
 
-    def run_match_analysis(self, matches: list, strategy_bot_instance, start_date: str) -> bool:
-        order, metrics = self._get_highest_order_metrics(matches)
+    def run_match_analysis(self, liquidity_context: list[LiquidityContext], strategy_bot_instance) -> bool:
+        liquidity_context_data = self.get_highest_order(liquidity_contexts=liquidity_context)
 
-        if not order or not metrics:
+        if not liquidity_context_data:
             return False
 
         matched = (
-                self.LOWEST_ODDS <= metrics["odds"] <= self.HIGHEST_ODDS
-                and self.LOWEST_HIGHEST_ORDER <= metrics["highest_order_liquidity"] <= self.HIGHEST_HIGHEST_ORDER
+                self.LOWEST_ODDS <= liquidity_context_data.highest_order.get("american_price", 0) <= self.HIGHEST_ODDS
+                and self.LOWEST_HIGHEST_ORDER <= liquidity_context_data.highest_order.get("liquidity_left", 0) <= self.HIGHEST_HIGHEST_ORDER
         )
 
         if not matched:
             return False
 
-        self.send_message(
-            strategy_bot_instance=strategy_bot_instance,
-            highest_order=order,
-            strategy_type=self.strategy_type,
-            start_date=start_date,
-            strategy_color=self.STRATEGY_COLOR,
-            stat_type="spread"
-        )
+        liquidity_context_data.strategy.strategy_name = self.strategy_type
+        liquidity_context_data.strategy.discord_color = self.STRATEGY_COLOR
+
+        self.send_message(strategy_bot_instance=strategy_bot_instance, liquidity_context=liquidity_context_data)
 
         return True
 
@@ -185,29 +171,26 @@ class NBASpreadValueHunter(Strategy):
     def part_of_strategy(self, stat_type: str, league: str) -> bool:
         return stat_type == "spread" and league == "nba"
 
-    def run_match_analysis(self, matches: list, strategy_bot_instance, start_date: str) -> bool:
-        order, metrics = self._get_highest_order_metrics(matches, check_underdog=True)
+    def run_match_analysis(self, liquidity_context: list[LiquidityContext], strategy_bot_instance) -> bool:
+        liquidity_context_data = self.get_highest_order(liquidity_contexts=liquidity_context)
 
-        if not order or not metrics:
+        if not liquidity_context_data:
             return False
 
+
         matched = (
-            metrics["is_underdog"]
-            and self.LOWEST_ODDS <= metrics["odds"] <= self.HIGHEST_ODDS
-            and metrics["highest_order_liquidity"] >= self.LOWEST_HIGHEST_ORDER
+            self.is_underdog(highest_order_side=liquidity_context_data.highest_order.get("side", '-'))
+            and self.LOWEST_ODDS <= liquidity_context_data.highest_order.get("american_price", 0) <= self.HIGHEST_ODDS
+            and liquidity_context_data.highest_order.get("liquidity_left", 0) >= self.LOWEST_HIGHEST_ORDER
         )
 
         if not matched:
             return False
 
-        self.send_message(
-            strategy_bot_instance=strategy_bot_instance,
-            highest_order=order,
-            strategy_type=self.strategy_type,
-            start_date=start_date,
-            strategy_color=self.STRATEGY_COLOR,
-            stat_type="spread"
-        )
+        liquidity_context_data.strategy.strategy_name = self.strategy_type
+        liquidity_context_data.strategy.discord_color = self.STRATEGY_COLOR
+
+        self.send_message(strategy_bot_instance=strategy_bot_instance, liquidity_context=liquidity_context_data)
 
         return True
 
@@ -225,29 +208,25 @@ class NBASpreadWhale(Strategy):
     def part_of_strategy(self, stat_type: str, league: str) -> bool:
         return stat_type == "spread" and league == "nba"
 
-    def run_match_analysis(self, matches: list, strategy_bot_instance, start_date: str) -> bool:
-        order, metrics = self._get_highest_order_metrics(matches)
+    def run_match_analysis(self, liquidity_context: list[LiquidityContext], strategy_bot_instance) -> bool:
+        liquidity_context_data = self.get_highest_order(liquidity_contexts=liquidity_context)
 
-        if not order or not metrics:
+        if not liquidity_context_data:
             return False
 
         matched = (
-                self.LOWEST_ODDS <= metrics["odds"] <= self.HIGHEST_ODDS
-                and metrics["highest_order_liquidity"] >= self.LOWEST_HIGHEST_ORDER
-                and metrics["liquidity_difference"] >= self.LOWEST_LIQUIDITY_DIFFERENCE
+                self.LOWEST_ODDS <= liquidity_context_data.highest_order.get("american_price", 0) <= self.HIGHEST_ODDS
+                and liquidity_context_data.highest_order.get("liquidity_left", 0) >= self.LOWEST_HIGHEST_ORDER
+                and liquidity_context_data.liquidity_difference >= self.LOWEST_LIQUIDITY_DIFFERENCE
         )
 
         if not matched:
             return False
 
-        self.send_message(
-            strategy_bot_instance=strategy_bot_instance,
-            highest_order=order,
-            strategy_type=self.strategy_type,
-            start_date=start_date,
-            strategy_color=self.STRATEGY_COLOR,
-            stat_type="spread"
-        )
+        liquidity_context_data.strategy.strategy_name = self.strategy_type
+        liquidity_context_data.strategy.discord_color = self.STRATEGY_COLOR
+
+        self.send_message(strategy_bot_instance=strategy_bot_instance, liquidity_context=liquidity_context_data)
 
         return True
 
@@ -265,36 +244,33 @@ class NBASpreadGodTier(Strategy):
     def part_of_strategy(self, stat_type: str, league: str) -> bool:
         return stat_type == "spread" and league == "nba"
 
-    def run_match_analysis(self, matches: list, strategy_bot_instance, start_date: str) -> bool:
-        order, metrics = self._get_highest_order_metrics(matches, check_favourite=True)
+    def run_match_analysis(self, liquidity_context: list[LiquidityContext], strategy_bot_instance) -> bool:
+        liquidity_context_data = self.get_highest_order(liquidity_contexts=liquidity_context)
 
-        if not order or not metrics:
+        if not liquidity_context_data:
             return False
 
+
         matched = (
-                metrics["is_favorite"]
-                and self.LOWEST_ODDS <= metrics["odds"] <= self.HIGHEST_ODDS
-                and metrics["highest_order_liquidity"] >= self.LOWEST_HIGHEST_ORDER
-                and metrics["liquidity_difference"] >= self.LOWEST_LIQUIDITY_DIFFERENCE
+                self.is_favorite(highest_order_side=liquidity_context_data.highest_order.get("side", ''))
+                and self.LOWEST_ODDS <= liquidity_context_data.highest_order.get("american_price", 0) <= self.HIGHEST_ODDS
+                and liquidity_context_data.highest_order.get("liquidity_left", 0) >= self.LOWEST_HIGHEST_ORDER
+                and liquidity_context_data.liquidity_difference >= self.LOWEST_LIQUIDITY_DIFFERENCE
         )
 
         if not matched:
             return False
 
-        self.send_message(
-            strategy_bot_instance=strategy_bot_instance,
-            highest_order=order,
-            strategy_type=self.strategy_type,
-            start_date=start_date,
-            strategy_color=self.STRATEGY_COLOR,
-            stat_type="spread"
-        )
+        liquidity_context_data.strategy.strategy_name = self.strategy_type
+        liquidity_context_data.strategy.discord_color = self.STRATEGY_COLOR
+
+        self.send_message(strategy_bot_instance=strategy_bot_instance, liquidity_context=liquidity_context_data)
 
         return True
 
 
 
-############# TOTALS ################
+# ############# TOTALS ################
 
 class NBATotalGoldUnder(Strategy):
     LOWEST_LIQUIDITY_DIFFERENCE = 20_000
@@ -307,31 +283,28 @@ class NBATotalGoldUnder(Strategy):
     def part_of_strategy(self, stat_type: str, league: str) -> bool:
         return stat_type == "total" and league == "nba"
 
-    def run_match_analysis(self, matches: list, strategy_bot_instance, start_date: str) -> bool:
-        order, metrics = self._get_highest_order_metrics(matches=matches, highest_type="highest_liquidity_difference", highest_order_side="under")
+    def run_match_analysis(self, liquidity_context: list[LiquidityContext], strategy_bot_instance) -> bool:
+        liquidity_context_data = self.get_highest_order(liquidity_contexts=liquidity_context, highest_type="highest_liquidity_difference")
 
-        if not order or not metrics:
+        if not liquidity_context_data:
             return False
 
         matched = (
-            metrics["highest_order_side"] == "under"
-            and metrics["liquidity_difference"] >= self.LOWEST_LIQUIDITY_DIFFERENCE
-            and metrics["odds"] >= self.LOWEST_ODDS
+                liquidity_context_data.highest_order.get("side", '') == "under"
+                and liquidity_context_data.liquidity_difference >= self.LOWEST_LIQUIDITY_DIFFERENCE
+                and liquidity_context_data.highest_order.get("american_price", 0) >= self.LOWEST_ODDS
         )
 
         if not matched:
             return False
 
-        self.send_message(
-            strategy_bot_instance=strategy_bot_instance,
-            highest_order=order,
-            strategy_type=self.strategy_type,
-            start_date=start_date,
-            strategy_color=self.STRATEGY_COLOR,
-            stat_type="total"
-        )
+        liquidity_context_data.strategy.strategy_name = self.strategy_type
+        liquidity_context_data.strategy.discord_color = self.STRATEGY_COLOR
+
+        self.send_message(strategy_bot_instance=strategy_bot_instance, liquidity_context=liquidity_context_data)
 
         return True
+
 
 class NBATotalPlatinumUnder(Strategy):
     LOWEST_LIQUIDITY_DIFFERENCE = 10_000
@@ -344,29 +317,25 @@ class NBATotalPlatinumUnder(Strategy):
     def part_of_strategy(self, stat_type: str, league: str) -> bool:
         return stat_type == "total" and league == "nba"
 
-    def run_match_analysis(self, matches: list, strategy_bot_instance, start_date: str) -> bool:
-        order, metrics = self._get_highest_order_metrics(matches=matches, highest_type="highest_liquidity_difference", highest_order_side="under")
+    def run_match_analysis(self, liquidity_context: list[LiquidityContext], strategy_bot_instance) -> bool:
+        liquidity_context_data = self.get_highest_order(liquidity_contexts=liquidity_context, highest_type="highest_liquidity_difference")
 
-        if not order or not metrics:
+        if not liquidity_context_data:
             return False
 
         matched = (
-            metrics["highest_order_side"] == "under"
-            and metrics["liquidity_difference"] >= self.LOWEST_LIQUIDITY_DIFFERENCE
-            and metrics["line"] >= self.LOWEST_LINE
+            liquidity_context_data.highest_order.get("side", '') == "under"
+            and liquidity_context_data.liquidity_difference >= self.LOWEST_LIQUIDITY_DIFFERENCE
+            and liquidity_context_data.additional_data.get("line", 0) >= self.LOWEST_LINE
         )
 
         if not matched:
             return False
 
-        self.send_message(
-            strategy_bot_instance=strategy_bot_instance,
-            highest_order=order,
-            strategy_type=self.strategy_type,
-            start_date=start_date,
-            strategy_color=self.STRATEGY_COLOR,
-            stat_type="total"
-        )
+        liquidity_context_data.strategy.strategy_name = self.strategy_type
+        liquidity_context_data.strategy.discord_color = self.STRATEGY_COLOR
+
+        self.send_message(strategy_bot_instance=strategy_bot_instance, liquidity_context=liquidity_context_data)
 
         return True
 
@@ -382,31 +351,26 @@ class NBATotalEliteOver(Strategy):
     def part_of_strategy(self, stat_type: str, league: str) -> bool:
         return stat_type == "total" and league == "nba"
 
-    def run_match_analysis(self, matches: list, strategy_bot_instance, start_date: str) -> bool:
-        order, metrics = self._get_highest_order_metrics(matches=matches, highest_type="highest_liquidity_difference", highest_order_side="over")
-        print(order)
+    def run_match_analysis(self, liquidity_context: list[LiquidityContext], strategy_bot_instance) -> bool:
+        liquidity_context_data = self.get_highest_order(liquidity_contexts=liquidity_context, highest_type="highest_liquidity_difference")
 
-        if not order or not metrics:
+        if not liquidity_context_data:
             return False
 
         matched = (
-            metrics["highest_order_side"] == "over"
-            and metrics["liquidity_difference"] >= self.LOWEST_LIQUIDITY_DIFFERENCE
-            and metrics["line"] >= self.LOWEST_LINE
-            and metrics["odds"] >= self.LOWEST_ODDS
+                liquidity_context_data.highest_order.get("side", '') == "over"
+                and liquidity_context_data.liquidity_difference >= self.LOWEST_LIQUIDITY_DIFFERENCE
+                and liquidity_context_data.additional_data.get("line", 0) >= self.LOWEST_LINE
+                and liquidity_context_data.highest_order.get("american_price", 0) >= self.LOWEST_ODDS
         )
 
         if not matched:
             return False
 
-        self.send_message(
-            strategy_bot_instance=strategy_bot_instance,
-            highest_order=order,
-            strategy_type=self.strategy_type,
-            start_date=start_date,
-            strategy_color=self.STRATEGY_COLOR,
-            stat_type="total"
-        )
+        liquidity_context_data.strategy.strategy_name = self.strategy_type
+        liquidity_context_data.strategy.discord_color = self.STRATEGY_COLOR
+
+        self.send_message(strategy_bot_instance=strategy_bot_instance, liquidity_context=liquidity_context_data)
 
         return True
 
@@ -421,28 +385,24 @@ class NBATotalSilverUnder(Strategy):
     def part_of_strategy(self, stat_type: str, league: str) -> bool:
         return stat_type == "total" and league == "nba"
 
-    def run_match_analysis(self, matches: list, strategy_bot_instance, start_date: str) -> bool:
-        order, metrics = self._get_highest_order_metrics(matches=matches, highest_type="highest_liquidity_difference", highest_order_side="under")
+    def run_match_analysis(self, liquidity_context: list[LiquidityContext], strategy_bot_instance) -> bool:
+        liquidity_context_data = self.get_highest_order(liquidity_contexts=liquidity_context, highest_type="highest_liquidity_difference")
 
-        if not order or not metrics:
+        if not liquidity_context_data:
             return False
 
         matched = (
-            metrics["highest_order_side"] == "under"
-            and self.LOWEST_LIQUIDITY_DIFFERENCE <= metrics["liquidity_difference"] <= self.HIGHEST_LIQUIDITY_DIFFERENCE
+                liquidity_context_data.highest_order.get("side", '') == "under"
+                and self.LOWEST_LIQUIDITY_DIFFERENCE <= liquidity_context_data.liquidity_difference <= self.HIGHEST_LIQUIDITY_DIFFERENCE
         )
 
         if not matched:
             return False
 
-        self.send_message(
-            strategy_bot_instance=strategy_bot_instance,
-            highest_order=order,
-            strategy_type=self.strategy_type,
-            start_date=start_date,
-            strategy_color=self.STRATEGY_COLOR,
-            stat_type="total"
-        )
+        liquidity_context_data.strategy.strategy_name = self.strategy_type
+        liquidity_context_data.strategy.discord_color = self.STRATEGY_COLOR
+
+        self.send_message(strategy_bot_instance=strategy_bot_instance, liquidity_context=liquidity_context_data)
 
         return True
 
@@ -459,41 +419,34 @@ class NBATotalTrueSilverUnder(Strategy):
     def part_of_strategy(self, stat_type: str, league: str) -> bool:
         return stat_type == "total" and league == "nba"
 
-    def run_match_analysis(self, matches: list, strategy_bot_instance, start_date: str) -> bool:
-        order, metrics = self._get_highest_order_metrics(matches=matches, highest_type="highest_liquidity_difference", highest_order_side="under")
+    def run_match_analysis(self, liquidity_context: list[LiquidityContext], strategy_bot_instance) -> bool:
+        liquidity_context_data = self.get_highest_order(liquidity_contexts=liquidity_context, highest_type="highest_liquidity_difference")
 
-        if not order or not metrics:
+        if not liquidity_context_data:
             return False
 
-        snapshot_time = metrics.get("snapshot_time")
+        snapshot_time = liquidity_context_data.strategy.snapshot_time
         pacific = ZoneInfo("America/Los_Angeles")
         snapshot_time_pacific = snapshot_time.astimezone(pacific)
-        start_date_dt = datetime.fromisoformat(start_date)
+        start_date_dt = datetime.fromisoformat(liquidity_context_data.start_date_dt)
         pacific_start_dt = start_date_dt.astimezone(pacific)
-
-
         modified_start_date_dt = pacific_start_dt - timedelta(minutes=self.MINUTES_FROM_GAME_START)
 
         matched = (
-            metrics["highest_order_side"] == "under"
-            and self.LOWEST_LIQUIDITY_DIFFERENCE <= metrics["liquidity_difference"] <= self.HIGHEST_LIQUIDITY_DIFFERENCE
-            and metrics["line"] <= self.HIGHEST_LINE
+            liquidity_context_data.highest_order.get("side", '') == "under"
+            and self.LOWEST_LIQUIDITY_DIFFERENCE <= liquidity_context_data.liquidity_difference <= self.HIGHEST_LIQUIDITY_DIFFERENCE
+            and liquidity_context_data.additional_data.get("line", 0) <= self.HIGHEST_LINE
             and modified_start_date_dt <= snapshot_time_pacific <= pacific_start_dt
         )
 
         if not matched:
             return False
 
-        order.update({"pacific_snapshot": snapshot_time_pacific})
+        liquidity_context_data.strategy.strategy_name = self.strategy_type
+        liquidity_context_data.strategy.discord_color = self.STRATEGY_COLOR
+        liquidity_context_data.strategy.include_snapshot = True
 
-        self.send_message(
-            strategy_bot_instance=strategy_bot_instance,
-            highest_order=order,
-            strategy_type=self.strategy_type,
-            start_date=start_date,
-            strategy_color=self.STRATEGY_COLOR,
-            stat_type="total"
-        )
+        self.send_message(strategy_bot_instance=strategy_bot_instance, liquidity_context=liquidity_context_data)
 
         return True
 

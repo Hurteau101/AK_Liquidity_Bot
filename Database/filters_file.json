@@ -1,0 +1,335 @@
+{
+    "data": [
+      {
+        "filter_category": "liquidity_difference_and_highest_order",
+        "league": "NBA",
+        "market_selection": "mainlines",
+        "liquidity_difference": 4000,
+        "highest_order": 5000,
+        "ping_difference": 1000,
+
+        "raw_name": "spread",
+        "display_name": "Spread",
+        "active": true,
+        "database_selection": "liquidity_difference"
+      },
+      {
+        "filter_category": "liquidity_difference_and_highest_order",
+        "league": "NBA",
+        "market_selection": "mainlines",
+        "liquidity_difference": 4000,
+        "highest_order": 5000,
+        "ping_difference": 1000,
+
+        "raw_name": "total",
+        "display_name": "Total",
+        "active": true,
+
+        "database_selection": "liquidity_difference"
+      },
+      {
+        "filter_category": "liquidity_difference_and_highest_order",
+        "league": "NBA",
+        "market_selection": "mainlines",
+        "liquidity_difference": 4000,
+        "highest_order": 5000,
+        "ping_difference": 1000,
+
+        "raw_name": "team_total",
+        "display_name": "Team Total",
+        "active": true,
+
+        "database_selection": "liquidity_difference"
+      },
+            {
+        "filter_category": "liquidity_difference_and_highest_order",
+        "league": "NBA",
+        "market_selection": "props",
+        "liquidity_difference": 3000,
+        "highest_order": 2499,
+        "ping_difference": 1000,
+
+        "raw_name": "points",
+        "display_name": "Points",
+        "active": true,
+
+        "database_selection": "highest_order"
+      },
+                  {
+        "filter_category": "liquidity_difference_and_highest_order",
+        "league": "NBA",
+        "market_selection": "props",
+        "liquidity_difference": 3000,
+        "highest_order": 2499,
+        "ping_difference": 1000,
+
+        "raw_name": "rebounds",
+        "display_name": "Rebounds",
+        "active": true,
+
+        "database_selection": "highest_order"
+      },
+      {
+        "filter_category": "liquidity_difference_and_highest_order",
+        "league": "NBA",
+        "market_selection": "props",
+        "liquidity_difference": 3000,
+        "highest_order": 2499,
+        "ping_difference": 1000,
+
+        "raw_name": "assists",
+        "display_name": "Assists",
+        "active": true,
+
+        "database_selection": "highest_order"
+      },
+            {
+        "filter_category": "liquidity_difference_and_highest_order",
+        "league": "NBA",
+        "market_selection": "props",
+        "liquidity_difference": 3000,
+        "highest_order": 2499,
+        "ping_difference": 1000,
+
+        "raw_name": "three_pointers_made",
+        "display_name": "3 Pointers Made",
+        "active": true,
+
+        "database_selection": "highest_order"
+      },
+                  {
+        "filter_category": "liquidity_difference_and_highest_order",
+        "league": "NBA",
+        "market_selection": "props",
+        "liquidity_difference": 3000,
+        "highest_order": 2499,
+        "ping_difference": 1000,
+
+       "raw_name": "points_rebounds_assists",
+        "display_name": "Points + Rebounds + Assists",
+        "active": true,
+
+        "database_selection": "highest_order"
+      },
+                        {
+        "filter_category": "liquidity_difference_and_highest_order",
+        "league": "NBA",
+        "market_selection": "props",
+        "liquidity_difference": 3000,
+        "highest_order": 2499,
+        "ping_difference": 1000,
+
+        "raw_name": "points_rebounds",
+        "display_name": "Points + Rebounds",
+        "active": true,
+
+        "database_selection": "highest_order"
+      },
+      {
+        "filter_category": "liquidity_difference_and_highest_order",
+        "league": "NBA",
+        "market_selection": "props",
+        "liquidity_difference": 3000,
+        "highest_order": 2499,
+        "ping_difference": 1000,
+
+        "raw_name": "points_assists",
+        "display_name": "Points + Assists",
+        "active": true,
+
+        "database_selection": "highest_order"
+      },
+      {
+        "filter_category": "liquidity_difference",
+        "league": "NCAAB",
+        "market_selection": "mainlines",
+        "liquidity_difference": 3000,
+        "ping_difference": 1000,
+
+        "raw_name": "total",
+        "display_name": "Total",
+        "active": true,
+
+        "database_selection": "liquidity_difference"
+      },
+      {
+        "filter_category": "liquidity_difference",
+        "league": "NCAAB",
+        "market_selection": "mainlines",
+        "liquidity_difference": 3000,
+        "ping_difference": 1000,
+
+        "raw_name": "spread",
+        "display_name": "Spread",
+        "active": true,
+
+        "database_selection": "liquidity_difference"
+      },
+      {
+        "filter_category": "liquidity_difference_and_highest_order",
+        "league": "NFL",
+        "market_selection": "mainlines",
+        "liquidity_difference": 4000,
+        "highest_order": 5000,
+        "ping_difference": 1000,
+
+        "raw_name": "spread",
+        "display_name": "Spread",
+        "active": true,
+        "database_selection": "liquidity_difference"
+      },
+            {
+        "filter_category": "liquidity_difference_and_highest_order",
+        "league": "NFL",
+        "market_selection": "mainlines",
+        "liquidity_difference": 4000,
+        "highest_order": 5000,
+        "ping_difference": 1000,
+
+        "raw_name": "total",
+        "display_name": "Total",
+        "active": true,
+        "database_selection": "liquidity_difference"
+      },
+                  {
+        "filter_category": "liquidity_difference_and_highest_order",
+        "league": "NFL",
+        "market_selection": "mainlines",
+        "liquidity_difference": 4000,
+        "highest_order": 5000,
+        "ping_difference": 1000,
+
+        "raw_name": "team_total",
+        "display_name": "Team Total",
+        "active": true,
+        "database_selection": "liquidity_difference"
+      },
+            {
+        "filter_category": "liquidity_difference_and_highest_order",
+        "league": "NFL",
+        "market_selection": "props",
+        "liquidity_difference": 3000,
+        "highest_order": 2499,
+        "ping_difference": 1000,
+
+        "raw_name": "rushing_yards",
+        "display_name": "Rushing Yards",
+        "active": true,
+
+        "database_selection": "highest_order"
+      },
+                  {
+        "filter_category": "liquidity_difference_and_highest_order",
+        "league": "NFL",
+        "market_selection": "props",
+        "liquidity_difference": 3000,
+        "highest_order": 2499,
+        "ping_difference": 1000,
+
+        "raw_name": "rushing_attempts",
+        "display_name": "Rushing Attempts",
+        "active": true,
+
+        "database_selection": "highest_order"
+      },
+                        {
+        "filter_category": "liquidity_difference_and_highest_order",
+        "league": "NFL",
+        "market_selection": "props",
+        "liquidity_difference": 3000,
+        "highest_order": 2499,
+        "ping_difference": 1000,
+
+        "raw_name": "longest_rush",
+        "display_name": "Longest Rush",
+        "active": true,
+
+
+        "database_selection": "highest_order"
+      },
+                              {
+        "filter_category": "liquidity_difference_and_highest_order",
+        "league": "NFL",
+        "market_selection": "props",
+        "liquidity_difference": 3000,
+        "highest_order": 2499,
+        "ping_difference": 1000,
+
+        "raw_name": "passing_yards",
+        "display_name": "Passing Yards",
+        "active": true,
+
+        "database_selection": "highest_order"
+      },
+                                    {
+        "filter_category": "liquidity_difference_and_highest_order",
+        "league": "NFL",
+        "market_selection": "props",
+        "liquidity_difference": 3000,
+        "highest_order": 2499,
+        "ping_difference": 1000,
+
+        "raw_name": "receiving_yards",
+        "display_name": "Receiving Yards",
+        "active": true,
+
+        "database_selection": "highest_order"
+      },
+                                          {
+        "filter_category": "liquidity_difference_and_highest_order",
+        "league": "NFL",
+        "market_selection": "props",
+        "liquidity_difference": 3000,
+        "highest_order": 2499,
+        "ping_difference": 1000,
+
+        "raw_name": "receptions",
+        "display_name": "Receptions",
+        "active": true,
+
+        "database_selection": "highest_order"
+      },
+                                                {
+        "filter_category": "liquidity_difference_and_highest_order",
+        "league": "NFL",
+        "market_selection": "props",
+        "liquidity_difference": 3000,
+        "highest_order": 2499,
+        "ping_difference": 1000,
+
+        "raw_name": "longest_reception",
+        "display_name": "Longest Receptions",
+        "active": true,
+
+        "database_selection": "highest_order"
+      },
+                                                      {
+        "filter_category": "liquidity_difference_and_highest_order",
+        "league": "NFL",
+        "market_selection": "props",
+        "liquidity_difference": 3000,
+        "highest_order": 2499,
+        "ping_difference": 1000,
+
+        "raw_name": "passing_completions",
+        "display_name": "Passing Completions",
+        "active": true,
+
+        "database_selection": "highest_order"
+      },
+                                                            {
+        "filter_category": "liquidity_difference_and_highest_order",
+        "league": "NFL",
+        "market_selection": "props",
+        "liquidity_difference": 3000,
+        "highest_order": 2499,
+        "ping_difference": 1000,
+
+        "raw_name": "passing_attempts",
+        "display_name": "Passing Attempts",
+        "active": true,
+
+        "database_selection": "highest_order"
+      }
+    ]
+}
