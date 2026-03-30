@@ -129,6 +129,7 @@ class Database:
 
         with self.conn.cursor() as cursor:
             market_type = liquidity_context.market_type
+            selector = liquidity_context.found_mapping.get("database_selection_type")
 
             player_name = liquidity_context.additional_data.get("player_name")
             stat_type = liquidity_context.additional_data.get("stat_type")
@@ -140,30 +141,38 @@ class Database:
             game_title = liquidity_context.additional_data.get("game_title")
             league = liquidity_context.league
 
+            compare_column = (
+                "liquidity_highest_order"
+                if selector == "highest_order"
+                else "liquidity_difference"
+            )
+
             if market_type == "mainlines":
                 sql = f"""
-                    SELECT id, liquidity_difference
+                    SELECT id, {compare_column}
                     FROM {table_name}
                     WHERE stat_type = %s
                       AND line IS NOT DISTINCT FROM %s
                       AND game_title = %s
                       AND league = %s
+                      AND market_type = %s
                 """
-                params = (stat_type, line, game_title, league)
+                params = (stat_type, line, game_title, league, market_type)
             else:
                 sql = f"""
-                    SELECT id, liquidity_highest_order
+                    SELECT id, {compare_column}
                     FROM {table_name}
                     WHERE player_name = %s
                       AND stat_type = %s
-                      AND line = %s
+                      AND line IS NOT DISTINCT FROM %s
                       AND game_title = %s
                       AND league = %s
+                      AND market_type = %s
                 """
-                params = (player_name, stat_type, line, game_title, league)
+                params = (player_name, stat_type, line, game_title, league, market_type)
 
             cursor.execute(sql, params)
-            data = cursor.fetchone()
+            return cursor.fetchone()
 
             return data
     def _insert_database(self, data, table_name):
