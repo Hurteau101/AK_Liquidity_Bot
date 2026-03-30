@@ -129,9 +129,14 @@ class Database:
 
         with self.conn.cursor() as cursor:
             market_type = liquidity_context.market_type
+
             player_name = liquidity_context.additional_data.get("player_name")
             stat_type = liquidity_context.additional_data.get("stat_type")
+
             line = liquidity_context.additional_data.get("line")
+            if line is not None:
+                line = float(line)
+
             game_title = liquidity_context.additional_data.get("game_title")
             league = liquidity_context.league
 
@@ -140,7 +145,7 @@ class Database:
                     SELECT id, liquidity_difference
                     FROM {table_name}
                     WHERE stat_type = %s
-                      AND line = %s
+                      AND line IS NOT DISTINCT FROM %s
                       AND game_title = %s
                       AND league = %s
                 """
@@ -158,8 +163,9 @@ class Database:
                 params = (player_name, stat_type, line, game_title, league)
 
             cursor.execute(sql, params)
-            return cursor.fetchone()
+            data = cursor.fetchone()
 
+            return data
     def _insert_database(self, data, table_name):
         with self.conn.cursor() as cursor:
             cursor.execute(f"""
@@ -298,21 +304,17 @@ class Database:
         }
 
         existing = self.check_existing_record(liquidity_context)
-
         selector = liquidity_context.found_mapping.get("database_selection_type", None)
 
         if not selector:
             raise ValueError(f"No database_selection_type found in found_mapping for liquidity context: {liquidity_context}")
 
         if existing:
-            print("Existing Found")
             existing_id, existing_order = existing
 
             if selector == "liquidity_difference":
-                print(selector)
                 current_order = liquidity_context.liquidity_difference
             elif selector == "highest_order":
-                print(selector)
                 current_order = liquidity_context.highest_order.get("liquidity_left")
             else:
                 raise ValueError(f"Unknown database_selection_type: {selector} for liquidity context: {liquidity_context}")
