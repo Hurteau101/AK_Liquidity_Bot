@@ -44,7 +44,7 @@ class BaseNotification:
         liquidity_summary = (
 
 
-            f"```\n{side_2_name} {liquidity_context.additional_data.get('line') if include_line else ''}: ${side_2_data.get('total_liquidity', 0)}"
+            f"```\n{side_2_name}{f' {line}' if include_line else ''}: ${side_2_data.get('total_liquidity', 0)}"
             f"\nCost Avg Odds: {SpreadNotification.format_odds(side_2_data.get('cost_avg_odds', 0))}\n\n"
             
             f"{side_1_name}{f' {line}' if include_line else ''}: ${side_1_data.get('total_liquidity', 0)}"

@@ -120,7 +120,9 @@ class Runner:
     def check_liquidity(self, liquidity_data: dict):
         for league, liquidity_list in liquidity_data.items():
             for liquidity in liquidity_list:
-                print(liquidity)
+                if league != "MLB":
+                    continue
+
                 selection_key = (league, liquidity.get("additional_data", {}).get("stat_type"))
                 found_mapping = self.mapping.get(selection_key)
 
