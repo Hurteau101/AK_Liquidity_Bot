@@ -133,7 +133,7 @@ class BaseNotification:
 class SpreadNotification(BaseNotification):
     def format_notification(self, liquidity_context: LiquidityContext) -> dict:
         # title = liquidity_context.highest_order_key if liquidity_context.strategy is None else liquidity_context.strategy.strategy_name
-        line = liquidity_context.additional_data.get("line", 0)
+        line = liquidity_context.additional_data.get("line", 0) if liquidity_context.strategy is None else liquidity_context.strategy.strategy_name
 
         return self.create_notification(
             title=f"+{str(line)}" if line > 0 else str(line),
@@ -149,7 +149,7 @@ class MoneylineNotification(SpreadNotification):
         # title = raw_title.upper() if len(raw_title) <= 3 else raw_title.title()
 
         return self.create_notification(
-            title="Moneyline",
+            title="Moneyline" if liquidity_context.strategy is None else liquidity_context.strategy.strategy_name,
             liquidity_context=liquidity_context,
             include_line=False,
             upper_case_highest_order_key=True,
