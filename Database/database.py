@@ -224,14 +224,16 @@ class Database:
             self.conn.commit()
 
     def get_outcome_ids(self):
+        table_name = "novig_tracking" if self.is_production else "novig_tracking_test_environment"
+
         with self.conn.cursor() as cursor:
-            cursor.execute("""
+            cursor.execute(f"""
                 SELECT outcome_id, highest_order_side
                 FROM (
                     SELECT 
                         over_outcome_id AS outcome_id,
                         highest_order_side
-                    FROM novig_tracking
+                    FROM {table_name}
                     WHERE over_result IS NULL
                       AND under_result IS NULL
                       AND over_outcome_id IS NOT NULL
@@ -365,22 +367,26 @@ class Database:
 
 
     def bulk_update_results(self, results):
+        table_name = "novig_tracking" if self.is_production else "novig_tracking_test_environment"
         with self.conn.cursor() as cursor:
             spread_results = [r for r in results if r[2] == 'SPREAD']
-            normal_results = [r for r in results if r[2] != 'SPREAD']
+            moneyline_results = [r for r in results if r[2] == 'MONEY']
+            print(spread_results)
+            normal_results = [r for r in results if r[2].upper() not in ['SPREAD', 'MONEY']]
+
 
             if normal_results:
                 necessary_values = [(r[0], r[1]) for r in normal_results]
 
-                sql_over = """
-                           UPDATE novig_tracking t
+                sql_over = f"""
+                           UPDATE {table_name} t
                            SET over_result = v.result FROM (VALUES %s) AS v(outcome_id \
                              , result)
                            WHERE t.over_outcome_id = v.outcome_id \
                            """
 
-                sql_under = """
-                            UPDATE novig_tracking t
+                sql_under = f"""
+                            UPDATE {table_name} t
                             SET under_result = v.result FROM (VALUES %s) AS v(outcome_id \
                               , result)
                             WHERE t.under_outcome_id = v.outcome_id \
@@ -390,18 +396,23 @@ class Database:
                 execute_values(cursor, sql_under, necessary_values)
 
 
-            if spread_results:
-                spread_win_values = [(r[0], r[3]) for r in spread_results if r[1].upper() in ["WIN", "PUSH"]]
+            if spread_results or moneyline_results:
+                type_result_values = [
+                    (r[0], r[3])
+                    for r in spread_results + moneyline_results
+                    if r[1].upper() in ["WIN", "PUSH"]
+                ]
 
-                if spread_win_values:
-                    sql_spread = """
-                        UPDATE novig_tracking t
-                        SET 
-                            spread_result = v.description
+                if type_result_values:
+                    sql_type_result = f"""
+                        UPDATE {table_name} t
+                        SET type_result = v.description
                         FROM (VALUES %s) AS v(outcome_id, description)
-                        WHERE (t.spread_team_1_outcome_id = v.outcome_id OR t.spread_team_2_outcome_id = v.outcome_id)
+                        WHERE t.type_team_1_outcome_id = v.outcome_id
+                           OR t.type_team_2_outcome_id = v.outcome_id
                     """
-                    execute_values(cursor, sql_spread, spread_win_values)
+                    execute_values(cursor, sql_type_result, type_result_values)
+
             self.conn.commit()
 
 

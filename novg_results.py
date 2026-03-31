@@ -9,6 +9,7 @@ class Results:
         outcome_data = db.get_outcome_ids()
 
         results = self.api_results(outcome_data)
+
         if results:
             db.bulk_update_results(results)
 
