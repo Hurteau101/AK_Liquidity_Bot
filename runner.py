@@ -120,9 +120,6 @@ class Runner:
     def check_liquidity(self, liquidity_data: dict):
         for league, liquidity_list in liquidity_data.items():
             for liquidity in liquidity_list:
-                if league != "MLB":
-                    continue
-
                 selection_key = (league, liquidity.get("additional_data", {}).get("stat_type"))
                 found_mapping = self.mapping.get(selection_key)
 
@@ -238,6 +235,7 @@ if __name__ == "__main__":
                 mapping_group[selection_key].update(filter)
 
         for index, league in enumerate(grouped_by_league):
+            print(league)
             runner = Runner(
                 database_instance=database,
                 mapping_data=mapping_group
