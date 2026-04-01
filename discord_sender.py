@@ -24,7 +24,7 @@ class BaseNotification:
         formated_game_date = self.get_time_pacific(game_start=liquidity_context.additional_data.get("game_start_time", ""))
 
         previously_sent = f"*(Play was sent previously but market moved +/- {liquidity_context.ping_movement_amount})*\n\n" \
-            if liquidity_context.already_sent else ""
+            if liquidity_context.already_sent and not liquidity_context.strategy else ""
 
 
         side_1_data = liquidity_context.main_liquidity.get(liquidity_context.side_1_name, {}).get("highest_order", {})
