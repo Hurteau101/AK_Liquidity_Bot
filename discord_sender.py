@@ -21,16 +21,10 @@ class BaseNotification:
         :param upper_case_highest_order_key: Whether to uppercase the side names in the liquidity summary
         :param upper_case_side_names: Whether to uppercase the side names in the liquidity summary
         """
-
-        previously_sent = (
-            f"*(Play was sent previously but market moved +/- {liquidity_context.ping_movement_amount})*\n\n"
-            if liquidity_context.already_sent and liquidity_context.strategy is None else ""
-        )
-
         formated_game_date = self.get_time_pacific(game_start=liquidity_context.additional_data.get("game_start_time", ""))
 
-        # previously_sent = f"*(Play was sent previously but market moved +/- {liquidity_context.ping_movement_amount})*\n\n" \
-        #     if liquidity_context.already_sent and not liquidity_context.strategy else ""
+        previously_sent = f"*(Play was sent previously but market moved +/- {liquidity_context.ping_movement_amount})*\n\n" \
+            if liquidity_context.already_sent and not liquidity_context.strategy else ""
 
 
         side_1_data = liquidity_context.main_liquidity.get(liquidity_context.side_1_name, {}).get("highest_order", {})
