@@ -235,7 +235,6 @@ if __name__ == "__main__":
                 mapping_group[selection_key].update(filter)
 
         for index, league in enumerate(grouped_by_league):
-            print(league)
             runner = Runner(
                 database_instance=database,
                 mapping_data=mapping_group

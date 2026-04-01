@@ -118,10 +118,17 @@ class Database:
             self.conn.commit()
 
     def fetch_filters(self):
+        table_name = "filters" if self.is_production else "test_environment_filters"
         with self.conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
-            cursor.execute("SELECT filter_category,league,market_selection,liquidity_difference_filter_amount,highest_order_filter_amount,"
-                           "ping_difference_amount,raw_name, display_name, active, max_odds, run_strategy_per_run, database_selection_type  "
-                           "FROM filters WHERE active = TRUE")
+            query = f"""
+                SELECT filter_category, league, market_selection,
+                       liquidity_difference_filter_amount, highest_order_filter_amount,
+                       ping_difference_amount, raw_name, display_name, active,
+                       max_odds, run_strategy_per_run, database_selection_type
+                FROM {table_name}
+                WHERE active = TRUE
+            """
+            cursor.execute(query)
             return cursor.fetchall()
 
     def check_existing_record(self, liquidity_context: LiquidityContext):
@@ -294,6 +301,11 @@ class Database:
             side_2_name = liquidity_context.side_2_name
             side_1_order, side_1_outcome_id = get_side_data(side_1_name)
             side_2_order, side_2_outcome_id = get_side_data(side_2_name)
+
+        if liquidity_context.additional_data.get("stat_type", '') == "Team Total":
+            side = liquidity_context.highest_order["side"]
+            team_name = " ".join(liquidity_context.additional_data.get('bet_info', "").split(" ")[2:])
+            liquidity_context.highest_order["side"] = f"{side} [{team_name}]"
 
         storable_data = {
             "player_name": liquidity_context.additional_data.get("player_name", None),
