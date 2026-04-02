@@ -290,7 +290,7 @@ class NBATotalGoldUnder(Strategy):
             return False
 
         matched = (
-                liquidity_context_data.highest_order.get("side", '') == "under"
+                "under" in liquidity_context_data.highest_order.get("side", '').lower()
                 and liquidity_context_data.liquidity_difference >= self.LOWEST_LIQUIDITY_DIFFERENCE
                 and liquidity_context_data.highest_order.get("american_price", 0) >= self.LOWEST_ODDS
         )
@@ -324,7 +324,7 @@ class NBATotalPlatinumUnder(Strategy):
             return False
 
         matched = (
-            liquidity_context_data.highest_order.get("side", '') == "under"
+            "under" in liquidity_context_data.highest_order.get("side", '').lower()
             and liquidity_context_data.liquidity_difference >= self.LOWEST_LIQUIDITY_DIFFERENCE
             and liquidity_context_data.additional_data.get("line", 0) >= self.LOWEST_LINE
         )
@@ -358,7 +358,7 @@ class NBATotalEliteOver(Strategy):
             return False
 
         matched = (
-                liquidity_context_data.highest_order.get("side", '') == "over"
+                "over" in liquidity_context_data.highest_order.get("side", '').lower()
                 and liquidity_context_data.liquidity_difference >= self.LOWEST_LIQUIDITY_DIFFERENCE
                 and liquidity_context_data.additional_data.get("line", 0) >= self.LOWEST_LINE
                 and liquidity_context_data.highest_order.get("american_price", 0) >= self.LOWEST_ODDS
@@ -392,7 +392,7 @@ class NBATotalSilverUnder(Strategy):
             return False
 
         matched = (
-                liquidity_context_data.highest_order.get("side", '') == "under"
+                "under" in liquidity_context_data.highest_order.get("side", '').lower()
                 and self.LOWEST_LIQUIDITY_DIFFERENCE <= liquidity_context_data.liquidity_difference <= self.HIGHEST_LIQUIDITY_DIFFERENCE
         )
 
@@ -433,7 +433,7 @@ class NBATotalTrueSilverUnder(Strategy):
         modified_start_date_dt = pacific_start_dt - timedelta(minutes=self.MINUTES_FROM_GAME_START)
 
         matched = (
-            liquidity_context_data.highest_order.get("side", '') == "under"
+            "under" in liquidity_context_data.highest_order.get("side", '').lower()
             and self.LOWEST_LIQUIDITY_DIFFERENCE <= liquidity_context_data.liquidity_difference <= self.HIGHEST_LIQUIDITY_DIFFERENCE
             and liquidity_context_data.additional_data.get("line", 0) <= self.HIGHEST_LINE
             and modified_start_date_dt <= snapshot_time_pacific <= pacific_start_dt

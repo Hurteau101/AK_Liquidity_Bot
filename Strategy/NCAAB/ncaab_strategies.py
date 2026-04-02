@@ -19,7 +19,7 @@ class NCAABTotalSkyHigh(Strategy):
             return False
 
         matched = (
-            liquidity_context.highest_order.get("side", '') == "over"
+            "over" in liquidity_context.highest_order.get("side", '').lower()
             and liquidity_context.additional_data.get("line", 0) > self.LOWEST_LINE
         )
 
@@ -50,7 +50,7 @@ class NCAABTotalUnder(Strategy):
             return False
 
         matched = (
-            liquidity_context.highest_order.get("side", '') == "under"
+            "under" in liquidity_context.highest_order.get("side", '').lower()
             and liquidity_context.additional_data.get("line", 0) < self.HIGHEST_LINE
             and self.LOWEST_ODDS < liquidity_context.highest_order.get("american_price", 0) < self.HIGHEST_ODDS
         )
@@ -141,7 +141,7 @@ class NCAABTotalOverHighJuice(Strategy):
             return False
 
         matched = (
-            liquidity_context.highest_order.get("side", '') == "over"
+            "over" in liquidity_context.highest_order.get("side", '').lower()
             and liquidity_context.highest_order.get("american_price", 0) <= self.HIGHEST_ODDS
         )
 

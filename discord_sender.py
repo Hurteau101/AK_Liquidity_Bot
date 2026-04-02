@@ -26,6 +26,10 @@ class BaseNotification:
         previously_sent = f"*(Play was sent previously but market moved +/- {liquidity_context.ping_movement_amount})*\n\n" \
             if liquidity_context.already_sent and not liquidity_context.strategy else ""
 
+        # previously_sent = (
+        #     f"*(Play was sent previously but market moved +/- {liquidity_context.ping_movement_amount})*\n\n"
+        #     if liquidity_context.already_sent and liquidity_context.strategy is None else ""
+        # )
 
         side_1_data = liquidity_context.main_liquidity.get(liquidity_context.side_1_name, {}).get("highest_order", {})
         side_2_data = liquidity_context.main_liquidity.get(liquidity_context.side_2_name, {}).get("highest_order", {})
