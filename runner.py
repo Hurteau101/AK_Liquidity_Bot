@@ -72,7 +72,12 @@ class Runner:
                                               stat_type=liquidity_context.additional_data.get("stat_type", '').lower())
                     and
                     strategy.run_match_analysis(liquidity_context=liquidity_context, strategy_bot_instance=self.strategy_bot)):
-                self.redis_strategy.set(name=liquidity_context.liquidity_key, ex=int(liquidity_context.start_date_buffer.timestamp() * 1000), value="")
+
+                self.redis_strategy.set(
+                    name=liquidity_context.liquidity_key,
+                    value="",
+                    exat=int(liquidity_context.start_date_buffer.timestamp())
+                )
                 break
 
     def store_unique_key(self, game_title: str, start_date_dt: datetime, league: str, stat_type: str):
@@ -93,12 +98,16 @@ class Runner:
         if found_key:
             return
 
-        self.redis_unique_keys.setex(name=game_key, value=json.dumps({
-            "game_title": game_title,
-            "start_date": start_date_dt.isoformat(),
-            "league": league,
-            "stat_type": stat_type
-        }), time=int(start_date_dt.timestamp() * 1000))
+        self.redis_unique_keys.set(
+            name=game_key,
+            value=json.dumps({
+                "game_title": game_title,
+                "start_date": start_date_dt.isoformat(),
+                "league": league,
+                "stat_type": stat_type
+            }),
+            exat=int(start_date_dt.timestamp())
+        )
 
 
     def process_liquidity(self, liquidity_context: LiquidityContext):
