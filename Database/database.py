@@ -163,8 +163,9 @@ class Database:
                       AND game_title = %s
                       AND league = %s
                       AND market_type = %s
+                    AND game_start_time = %s
                 """
-                params = (stat_type, line, game_title, league, market_type)
+                params = (stat_type, line, game_title, league, market_type, liquidity_context.additional_data.get("game_start_time"))
             else:
                 sql = f"""
                     SELECT id, {compare_column}
@@ -175,8 +176,9 @@ class Database:
                       AND game_title = %s
                       AND league = %s
                       AND market_type = %s
+                      AND game_start_time = %s
                 """
-                params = (player_name, stat_type, line, game_title, league, market_type)
+                params = (player_name, stat_type, line, game_title, league, market_type, liquidity_context.additional_data.get("game_start_time"))
 
             cursor.execute(sql, params)
             return cursor.fetchone()
@@ -306,6 +308,7 @@ class Database:
             side = liquidity_context.highest_order["side"]
             team_name = " ".join(liquidity_context.additional_data.get('bet_info', "").split(" ")[2:])
             liquidity_context.highest_order["side"] = f"{side} [{team_name}]"
+            # print(liquidity_context.highest_order["side"])
 
         storable_data = {
             "player_name": liquidity_context.additional_data.get("player_name", None),
@@ -333,6 +336,7 @@ class Database:
         }
 
         existing = self.check_existing_record(liquidity_context)
+        print(existing)
         selector = liquidity_context.found_mapping.get("database_selection_type", None)
 
         if not selector:
@@ -383,7 +387,6 @@ class Database:
         with self.conn.cursor() as cursor:
             spread_results = [r for r in results if r[2] == 'SPREAD']
             moneyline_results = [r for r in results if r[2] == 'MONEY']
-            print(spread_results)
             normal_results = [r for r in results if r[2].upper() not in ['SPREAD', 'MONEY']]
 
 

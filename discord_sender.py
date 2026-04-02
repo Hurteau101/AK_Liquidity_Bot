@@ -39,6 +39,7 @@ class BaseNotification:
         snapshot_snippet = f"{liquidity_context.strategy.snapshot_time.strftime('%H:%M')} PST" if include_snapshot else ""
 
         side_1_name = liquidity_context.side_1_name.upper() if upper_case_side_names else liquidity_context.side_1_name.title()
+
         side_2_name = liquidity_context.side_2_name.upper() if upper_case_side_names else liquidity_context.side_2_name.title()
 
         highest_order_key = liquidity_context.highest_order_key.upper() if upper_case_highest_order_key else liquidity_context.highest_order_key.title()
@@ -192,7 +193,7 @@ class OverUnderNotification(BaseNotification):
         return self.create_notification(
             title=title,
             liquidity_context=liquidity_context,
-            include_line=True,
+            include_line=False,
             upper_case_highest_order_key=False,
             upper_case_side_names=False
         )
@@ -207,7 +208,7 @@ class PlayerNotification(BaseNotification):
         return self.create_notification(
             title=title,
             liquidity_context=liquidity_context,
-            include_line=True,
+            include_line=False,
             upper_case_highest_order_key=False,
             upper_case_side_names=False
         )
