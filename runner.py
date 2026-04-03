@@ -38,16 +38,7 @@ class Runner:
         if start_date is None or not liquidity_key or liquidity_data is None:
             raise ValueError("start_date, liquidity_key, and liquidity_data must be provided")
 
-        ttl_seconds = int(
-            (start_date - datetime.now(tz=start_date.tzinfo)).total_seconds()
-        )
-
-        # ### REMOVE THIS AFTERWARDS
-        # self.redis_sent.setex(name=liquidity_key, value=json.dumps({liquidity_key: liquidity_data}), time=120000)
-        # ##########################
-
-
-        self.redis_sent.setex(name=liquidity_key, value=json.dumps({liquidity_key: liquidity_data}), time=ttl_seconds)
+        self.redis_sent.set(name=liquidity_key, value=json.dumps({liquidity_key: liquidity_data}), exat=int(start_date.timestamp()))
 
 
     def check_strategy(self, liquidity_context: LiquidityContext):
@@ -76,7 +67,7 @@ class Runner:
                 self.redis_strategy.set(
                     name=liquidity_context.liquidity_key,
                     value="",
-                    exat=int(liquidity_context.start_date_buffer.timestamp())
+                    exat=int(liquidity_context.start_date_dt.timestamp())
                 )
                 break
 
