@@ -84,12 +84,12 @@ def run_strategy_check():
                 if strategy.part_of_strategy(
                     stat_type=liquidity_data.get("stat_type", "").lower(), league=liquidity_data.get("league", "").lower()
                 ) and strategy.run_match_analysis(liquidity_context=context_list, strategy_bot_instance=strategy_bot):
+                    modified_start = start_date_dt + timedelta(minutes=60)
+
                     redis_strategy_sent_instance.set(
                         name=key,
                         value="",
-                        exat=int(start_date_dt.timestamp())
+                        exat=int(modified_start.timestamp())
                     )
                     break
-
-
 
