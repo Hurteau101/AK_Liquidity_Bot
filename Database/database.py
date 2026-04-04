@@ -388,8 +388,8 @@ class Database:
             spread_results = [r for r in results if r[2] == 'SPREAD']
             moneyline_results = [r for r in results if r[2] == 'MONEY']
             normal_results = [r for r in results if r[2].upper() not in ['SPREAD', 'MONEY']]
-
-
+            team_results = [r for r in results if r[2] == 'TEAM_TOTAL']
+            print(team_results)
             if normal_results:
                 necessary_values = [(r[0], r[1]) for r in normal_results]
 
@@ -411,10 +411,10 @@ class Database:
                 execute_values(cursor, sql_under, necessary_values)
 
 
-            if spread_results or moneyline_results:
+            if spread_results or moneyline_results or team_results:
                 type_result_values = [
                     (r[0], r[3])
-                    for r in spread_results + moneyline_results
+                    for r in spread_results + moneyline_results + team_results
                     if r[1].upper() in ["WIN", "PUSH"]
                 ]
 

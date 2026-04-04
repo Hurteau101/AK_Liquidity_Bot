@@ -9,7 +9,7 @@ class Results:
         outcome_data = db.get_outcome_ids()
 
         results = self.api_results(outcome_data)
-
+        print(results)
         if results:
             db.bulk_update_results(results)
 
@@ -53,6 +53,7 @@ class Results:
                 for market in outcome.get("outcomes"):
                     if market.get("status") != "TBD":
                         side = outcome_data.get(market.get("id"), {})
+
                         if side is None:
                             results.append(
                                 (market.get("id"), market.get("status"), outcome.get("type"), market.get("description"))
@@ -60,7 +61,7 @@ class Results:
 
                             continue
 
-                        if side in market.get("description", "").lower():
+                        if market.get("description", "").lower() in side:
                             results.append(
                                 (market.get("id"), market.get("status"), outcome.get("type"), market.get("description"))
                             )
