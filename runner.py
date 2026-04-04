@@ -146,8 +146,8 @@ class Runner:
                 filtered_highest_odds_restriction = found_mapping.get("max_odds")
 
                 if any([
-                    highest_order_amount < (found_mapping.get("liquidity_difference_filter_amount") or 0),
-                    liquidity_difference < (found_mapping.get("highest_order_filter_amount") or 0),
+                    liquidity_difference < (found_mapping.get("liquidity_difference_filter_amount") or 0),
+                    highest_order_amount < (found_mapping.get("highest_order_filter_amount") or 0),
                     (filtered_highest_odds_restriction and highest_odds > filtered_highest_odds_restriction)
                 ]):
                     continue
