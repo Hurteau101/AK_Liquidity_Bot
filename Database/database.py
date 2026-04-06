@@ -281,7 +281,7 @@ class Database:
 
     def controller(self, liquidity_context: LiquidityContext):
         def is_moneyline_or_spread(listed_stat_type):
-            return listed_stat_type in ["Moneyline", "Spread"]
+            return listed_stat_type in ["Moneyline", "Spread", "1st Half Spread"]
 
         def get_side_data(side_name):
             order = liquidity_context.main_liquidity.get(side_name, {}).get("highest_order", {})
@@ -385,11 +385,11 @@ class Database:
     def bulk_update_results(self, results):
         table_name = "novig_tracking" if self.is_production else "novig_tracking_test_environment"
         with self.conn.cursor() as cursor:
-            spread_results = [r for r in results if r[2] == 'SPREAD']
+            spread_results = [r for r in results if r[2] in ['SPREAD', 'SPREAD_1H']]
             moneyline_results = [r for r in results if r[2] == 'MONEY']
             normal_results = [r for r in results if r[2].upper() not in ['SPREAD', 'MONEY']]
             team_results = [r for r in results if r[2] == 'TEAM_TOTAL']
-            print(team_results)
+
             if normal_results:
                 necessary_values = [(r[0], r[1]) for r in normal_results]
 
