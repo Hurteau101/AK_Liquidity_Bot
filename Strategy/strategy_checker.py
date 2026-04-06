@@ -15,8 +15,8 @@ STRATEGIES = {
     "NBA": [
         NBASpreadValueHunter(),
         NBASpreadGodTier(),
-        NBASpreadWhale(),
         NBASpreadSignalDecay(),
+        NBASpreadWhale(),
         NBASpreadVolumeFavorites(),
         NBASpreadSniper(),
         NBASpreadExecutive(),
