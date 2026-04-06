@@ -44,6 +44,42 @@ class NBASpreadSniper(Strategy):
 
         return True
 
+class NBASpreadSignalDecay(Strategy):
+    LOWEST_HIGHEST_ORDER = 5000
+    HIGHEST_HIGHEST_ORDER = 7500
+    LOWEST_LIQUIDITY_DIFFERENCE = 5000
+    HIGHEST_LIQUIDITY_DIFFERENCE = 15_000
+    STRATEGY_COLOR = 0x8B4513
+
+
+    def __init__(self):
+        super().__init__(strategy_type="Signal Decay")
+
+    def part_of_strategy(self, stat_type: str, league: str) -> bool:
+        return stat_type == "spread" and league == "nba"
+
+    def run_match_analysis(self, liquidity_context: list[LiquidityContext], strategy_bot_instance) -> bool:
+        liquidity_context_data = self.get_highest_order(liquidity_contexts=liquidity_context)
+
+        if not liquidity_context_data:
+            return False
+
+        matched = (
+            self.LOWEST_HIGHEST_ORDER <= liquidity_context_data.highest_order.get("liquidity_left") <= self.HIGHEST_HIGHEST_ORDER
+            and self.LOWEST_LIQUIDITY_DIFFERENCE <= liquidity_context_data.liquidity_difference <= self.HIGHEST_LIQUIDITY_DIFFERENCE
+        )
+
+        if not matched:
+            return False
+
+        liquidity_context_data.strategy.strategy_name = self.strategy_type
+        liquidity_context_data.strategy.discord_color = self.STRATEGY_COLOR
+
+        self.send_message(strategy_bot_instance=strategy_bot_instance, liquidity_context=liquidity_context_data)
+
+        return True
+
+
 
 class NBASpreadExecutive(Strategy):
     LOWEST_ODDS = -110

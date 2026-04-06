@@ -3,7 +3,7 @@ import json
 import redis
 from Strategy.NBA.nba_strategies import NBASpreadSniper, NBASpreadExecutive, NBASpreadVolumeFavorites, NBASpreadVolume, \
     NBASpreadValueHunter, NBASpreadWhale, NBASpreadGodTier, NBATotalGoldUnder, NBATotalPlatinumUnder, NBATotalEliteOver, \
-    NBATotalSilverUnder, NBATotalTrueSilverUnder
+    NBATotalSilverUnder, NBATotalTrueSilverUnder, NBASpreadSignalDecay
 
 from liqudity_context import LiquidityContext, LiquidityStrategy
 from discord_sender import StrategyBot
@@ -16,6 +16,7 @@ STRATEGIES = {
         NBASpreadValueHunter(),
         NBASpreadGodTier(),
         NBASpreadWhale(),
+        NBASpreadSignalDecay(),
         NBASpreadVolumeFavorites(),
         NBASpreadSniper(),
         NBASpreadExecutive(),
