@@ -49,7 +49,7 @@ class MLBStrikeoutLowLines(Strategy):
 
         matched = (
             "over" in liquidity_context.highest_order.get("side", '').lower()
-            and liquidity_context.additional_data.get("line", 0) > self.LOWEST_LINE
+            and liquidity_context.additional_data.get("line", 0) <= self.LOWEST_LINE
         )
 
         if not matched:
