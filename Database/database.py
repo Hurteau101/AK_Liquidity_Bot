@@ -124,7 +124,7 @@ class Database:
                 SELECT filter_category, league, market_selection,
                        liquidity_difference_filter_amount, highest_order_filter_amount,
                        ping_difference_amount, raw_name, display_name, active,
-                       max_odds, run_strategy_per_run, database_selection_type
+                       max_odds, run_strategy_per_run, database_selection_type, directional_check
                 FROM {table_name}
                 WHERE active = TRUE
             """
@@ -336,7 +336,6 @@ class Database:
         }
 
         existing = self.check_existing_record(liquidity_context)
-        print(existing)
         selector = liquidity_context.found_mapping.get("database_selection_type", None)
 
         if not selector:
