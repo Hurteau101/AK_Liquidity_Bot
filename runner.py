@@ -1,11 +1,13 @@
 import asyncio
 import re
 from collections import defaultdict
+from dataclasses import asdict
 from datetime import datetime, timedelta
 import redis
 from novig import Novig
 import json
 from Database.database import Database
+from Strategy.MLB.mlb_strategies import MLBStrikeoutGolden, MLBStrikeoutLowLines, MLBStrikeoutFavoriteOvers, MLBStrikeoutMidLine
 from Strategy.NCAAB.ncaab_strategies import NCAABTotalSkyHigh, NCAABTotalUnder, NCAABTotalGoldMine, NCAABTotalLowLine, \
     NCAABTotalOverHighJuice
 from discord_sender import DiscordBot, StrategyBot
@@ -18,6 +20,12 @@ STRATEGIES_PER_RUN = {
         NCAABTotalGoldMine(),
         NCAABTotalLowLine(),
         NCAABTotalOverHighJuice(),
+    ],
+    "MLB": [
+        MLBStrikeoutGolden(),
+        MLBStrikeoutFavoriteOvers(),
+        MLBStrikeoutMidLine(),
+        MLBStrikeoutLowLines()
     ]
 }
 class Runner:
@@ -46,8 +54,22 @@ class Runner:
             return
 
         sent_already = self.redis_strategy.get(liquidity_context.liquidity_key)
-        if sent_already:
+
+        directional_check = liquidity_context.found_mapping.get("directional_check", False)
+
+        if sent_already and not directional_check:
             return
+
+        deserialized = json.loads(sent_already) if sent_already else None
+
+        if directional_check and deserialized:
+            stored_direction = deserialized.get("highest_order_key", '')
+            is_same_direction = True if stored_direction.lower() == liquidity_context.highest_order_key.lower() else False
+
+            # This means its not the opposite direction, so we can early return.
+            # Only want to continue running if its the opposite direction since we already sent a strategy for that direction.
+            if is_same_direction:
+                return
 
         # Initialize strategy in context for use in strategies and discord message - Initialziing here
         # so we can pass in `include_tag`
@@ -66,9 +88,10 @@ class Runner:
 
                 self.redis_strategy.set(
                     name=liquidity_context.liquidity_key,
-                    value="",
+                    value=json.dumps(asdict(liquidity_context), default=str),
                     exat=int(liquidity_context.start_date_dt.timestamp())
                 )
+
                 break
 
     def store_unique_key(self, game_title: str, start_date_dt: datetime, league: str, stat_type: str):
@@ -188,7 +211,6 @@ class Runner:
                 previous_liquidity_raw = self.redis_sent.get(redis_key)
 
                 if previous_liquidity_raw is None:
-                    print("New Liquidity Found")
                     self.process_liquidity(liquidity_context=context)
                     continue
 

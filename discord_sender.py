@@ -12,7 +12,8 @@ load_dotenv()
 
 class BaseNotification:
     def create_notification(self, title: str, liquidity_context: LiquidityContext, include_line: bool = True,
-                            upper_case_highest_order_key: bool = True, upper_case_side_names: bool = True) -> dict:
+                            upper_case_highest_order_key: bool = True, upper_case_side_names: bool = True,
+                            include_strategy_player_name: bool = False) -> dict:
         """
         Create a structured notification message based on the provided liquidity context and order data.
         :param title: The title of the notification
@@ -65,6 +66,11 @@ class BaseNotification:
             {
                 "name": "",
                 "value": f"**Stat Type:** {liquidity_context.additional_data.get('stat_type', '')}",
+                "inline": False
+            },
+            {
+                "name": "",
+                "value": f"**Player:** {liquidity_context.strategy.player_name}" if liquidity_context.strategy and liquidity_context.strategy.player_name else '',
                 "inline": False
             },
             {
@@ -288,6 +294,7 @@ class StrategyBot(DiscordBot):
         mapper = {
             "nba": os.getenv("STRATEGY_BOT_WEBHOOK_URL_NBA"),
             "ncaab": os.getenv("STRATEGY_BOT_WEBHOOK_URL_NCAAB"),
+            "mlb": os.getenv("STRATEGY_BOT_WEBHOOK_URL_MLB"),
         }
 
         return mapper[league.lower()]

@@ -10,6 +10,7 @@ class LiquidityStrategy:
     include_tag: Optional[bool] = False
     snapshot_time: Optional[datetime] = None
     include_snapshot: Optional[bool] = False
+    player_name: Optional[str] = None
 
 @dataclass
 class LiquidityContext:
