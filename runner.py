@@ -83,7 +83,7 @@ class Runner:
         league_strategy = STRATEGIES_PER_RUN.get(liquidity_context.league.upper(), [])
 
         for strategy in league_strategy:
-            logging.info("Checking strategy: ", strategy.__class__.__name__)
+            logging.info(f"Checking strategy: {strategy.__class__.__name__}")
             if (
                     strategy.part_of_strategy(league=liquidity_context.league.lower(),
                                               stat_type=liquidity_context.additional_data.get("stat_type", '').lower())
