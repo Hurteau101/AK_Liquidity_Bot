@@ -19,11 +19,17 @@ class Strategy(ABC):
     def run_match_analysis(self, liquidity_context: LiquidityContext, strategy_bot_instance) -> bool:
         pass
 
-    def is_underdog(self, highest_order_side: str):
+    def is_underdog_spread(self, highest_order_side: str):
         """Check if the highest order side indicates an underdog (e.g., does not contain a "-")"""
         return "-" not in str(highest_order_side)
 
-    def is_favorite(self, highest_order_side: str):
+    def is_favorite_odds(self, highest_order_odds: float | int | str):
+        return "-" in str(highest_order_odds)
+
+    def is_underdog_odds(self, highest_order_odds: float | int | str):
+        return "-" not in str(highest_order_odds)
+
+    def is_favorite_spread(self, highest_order_side: str):
         """Check if the highest order side indicates a favorite (e.g., contains a "-")"""
         return "-" in str(highest_order_side)
 

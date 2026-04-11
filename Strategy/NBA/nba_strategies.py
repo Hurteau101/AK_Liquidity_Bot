@@ -28,7 +28,7 @@ class NBASpreadSniper(Strategy):
             return False
 
         matched = (
-            self.is_favorite(highest_order_side=liquidity_context_data.highest_order.get("side", ''))
+            self.is_favorite_spread(highest_order_side=liquidity_context_data.highest_order.get("side", ''))
             and self.LOWEST_ODDS <= liquidity_context_data.highest_order.get("american_price", 0) <= self.HIGHEST_ODDS
             and self.LOWEST_HIGHEST_ORDER <= liquidity_context_data.highest_order.get("liquidity_left") <= self.HIGHEST_HIGHEST_ORDER
             and self.LOWEST_LIQUIDITY_DIFFERENCE <= liquidity_context_data.liquidity_difference <= self.HIGHEST_LIQUIDITY_DIFFERENCE
@@ -142,7 +142,7 @@ class NBASpreadVolumeFavorites(Strategy):
             return False
 
         matched = (
-                self.is_favorite(highest_order_side=liquidity_context_data.highest_order.get("side", ''))
+                self.is_favorite_spread(highest_order_side=liquidity_context_data.highest_order.get("side", ''))
                 and self.LOWEST_ODDS <= liquidity_context_data.highest_order.get("american_price", 0) <= self.HIGHEST_ODDS
                 and self.LOWEST_HIGHEST_ORDER <= liquidity_context_data.highest_order.get("liquidity_left", 0) <= self.HIGHEST_HIGHEST_ORDER
         )
@@ -288,7 +288,7 @@ class NBASpreadGodTier(Strategy):
 
 
         matched = (
-                self.is_favorite(highest_order_side=liquidity_context_data.highest_order.get("side", ''))
+                self.is_favorite_spread(highest_order_side=liquidity_context_data.highest_order.get("side", ''))
                 and self.LOWEST_ODDS <= liquidity_context_data.highest_order.get("american_price", 0) <= self.HIGHEST_ODDS
                 and liquidity_context_data.highest_order.get("liquidity_left", 0) >= self.LOWEST_HIGHEST_ORDER
                 and liquidity_context_data.liquidity_difference >= self.LOWEST_LIQUIDITY_DIFFERENCE
