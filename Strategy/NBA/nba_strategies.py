@@ -215,7 +215,7 @@ class NBASpreadValueHunter(Strategy):
 
 
         matched = (
-            self.is_underdog(highest_order_side=liquidity_context_data.highest_order.get("side", '-'))
+            self.is_underdog_spread(highest_order_side=liquidity_context_data.highest_order.get("side", '-'))
             and self.LOWEST_ODDS <= liquidity_context_data.highest_order.get("american_price", 0) <= self.HIGHEST_ODDS
             and liquidity_context_data.highest_order.get("liquidity_left", 0) >= self.LOWEST_HIGHEST_ORDER
         )
