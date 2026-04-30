@@ -231,12 +231,14 @@ class DiscordBot:
                 "nfl": os.getenv("DISCORD_WEBHOOK_URL_NFL_PROPS"),
                 "nba": os.getenv("DISCORD_WEBHOOK_URL_NBA_PROPS"),
                 "mlb": os.getenv("DISCORD_WEBHOOK_URL_MLB_PROPS"),
+                "wnba": os.getenv("DISCORD_WEBHOOK_URL_WNBA_PROPS"),
             },
             "mainlines": {
                 "nfl": os.getenv("DISCORD_WEBHOOK_URL_NFL_MAINLINES"),
                 "nba": os.getenv("DISCORD_WEBHOOK_URL_NBA_MAINLINES"),
                 "ncaab": os.getenv("DISCORD_WEBHOOK_URL_NCAAB_MAINLINES"),
                 "mlb": os.getenv("DISCORD_WEBHOOK_URL_MLB_MAINLINES"),
+                "wnba": os.getenv("DISCORD_WEBHOOK_URL_WNBA_MAINLINES"),
             }
         }
 
