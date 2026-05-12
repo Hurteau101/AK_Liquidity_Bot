@@ -19,14 +19,17 @@ from liqudity_context import LiquidityContext, LiquidityStrategy
 
 
 STRATEGIES_PER_RUN = {
-    "NCAAB": [
+    "NCAAB": {
+        "total": [
         NCAABTotalSkyHigh(),
         NCAABTotalUnder(),
         NCAABTotalGoldMine(),
         NCAABTotalLowLine(),
         NCAABTotalOverHighJuice(),
-    ],
-    "MLB": [
+        ],
+    },
+    "MLB": {
+        "1st half total": [
         # MLBStrikeoutGolden(),
         # MLBStrikeoutFavoriteOvers(),
         # MLBStrikeoutMidLine(),
@@ -35,7 +38,8 @@ STRATEGIES_PER_RUN = {
         MLB1HFadeGaps(),
         MLB1HFadeLateReach(),
         # MLB1HFadeWhales()
-    ]
+        ]
+    }
 }
 class Runner:
     def __init__(self, database_instance: Database, mapping_data: dict):
@@ -65,11 +69,7 @@ class Runner:
         sent_already = self.redis_strategy.get(liquidity_context.liquidity_key)
 
         directional_check = liquidity_context.found_mapping.get("directional_check", False)
-
-        if sent_already and not directional_check:
-            return
-
-        deserialized = json.loads(sent_already) if sent_already else None
+        deserialized = json.loads(sent_already) if sent_already else {}
 
         if directional_check and deserialized:
             stored_direction = deserialized.get("highest_order_key", '')
@@ -86,23 +86,32 @@ class Runner:
             include_tag=True
         )
 
-        league_strategy = STRATEGIES_PER_RUN.get(liquidity_context.league.upper(), [])
+        league_strategy = STRATEGIES_PER_RUN.get(liquidity_context.league.upper(), {})
+        stat_type = liquidity_context.additional_data.get("stat_type", ).lower()
+        stat_type_strategy: list = league_strategy.get(stat_type, [])
 
-        for strategy in league_strategy:
-            logging.info(f"Checking strategy: {strategy.__class__.__name__}")
-            if (
-                    strategy.part_of_strategy(league=liquidity_context.league.lower(),
-                                              stat_type=liquidity_context.additional_data.get("stat_type", '').lower())
-                    and
-                    strategy.run_match_analysis(liquidity_context=liquidity_context, strategy_bot_instance=self.strategy_bot)):
+        # Store length + 1 since when we are checking, we want to check higher precedence strategies, and if there is one found, we will send it.
+        current_strategy_index = deserialized.get("additional_data", {}).get("strategy_index", len(stat_type_strategy) + 1)
 
-                self.redis_strategy.set(
-                    name=liquidity_context.liquidity_key,
-                    value=json.dumps(asdict(liquidity_context), default=str),
-                    exat=int(liquidity_context.start_date_dt.timestamp())
-                )
+        for index, strategy in enumerate(stat_type_strategy, start=1):
+            if (directional_check and not sent_already) or index < current_strategy_index:
+                logging.info(f"Checking strategy: {strategy.__class__.__name__}")
+                if (
+                        strategy.part_of_strategy(league=liquidity_context.league.lower(),
+                                                  stat_type=liquidity_context.additional_data.get("stat_type", '').lower())
+                        and
+                        strategy.run_match_analysis(liquidity_context=liquidity_context, strategy_bot_instance=self.strategy_bot)):
 
-                break
+                    # Store current strategy index, as there are times where we want to only send strategies that are higher precendence than the current index.
+                    liquidity_context.additional_data["strategy_index"] = index
+
+                    self.redis_strategy.set(
+                        name=liquidity_context.liquidity_key,
+                        value=json.dumps(asdict(liquidity_context), default=str),
+                        exat=int(liquidity_context.start_date_dt.timestamp())
+                    )
+
+                    break
 
     def store_unique_key(self, game_title: str, start_date_dt: datetime, league: str, stat_type: str):
         """This is used to store a unique key containing the league, game title and stat type"""
