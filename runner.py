@@ -8,7 +8,9 @@ import redis
 from novig import Novig
 import json
 from Database.database import Database
-from Strategy.MLB.mlb_strategies import MLBStrikeoutGolden, MLBStrikeoutLowLines, MLBStrikeoutFavoriteOvers, MLBStrikeoutMidLine
+from Strategy.MLB.mlb_strategies import (MLBStrikeoutGolden, MLBStrikeoutLowLines, MLBStrikeoutFavoriteOvers,
+                                         MLBStrikeoutMidLine,
+                                         MLB1HTierOne, MLB1HFadeGaps, MLB1HFadeLateReach, MLB1HFadeWhales)
 from Strategy.NCAAB.ncaab_strategies import NCAABTotalSkyHigh, NCAABTotalUnder, NCAABTotalGoldMine, NCAABTotalLowLine, \
     NCAABTotalOverHighJuice
 from discord_sender import DiscordBot, StrategyBot
@@ -25,10 +27,14 @@ STRATEGIES_PER_RUN = {
         NCAABTotalOverHighJuice(),
     ],
     "MLB": [
-        MLBStrikeoutGolden(),
-        MLBStrikeoutFavoriteOvers(),
-        MLBStrikeoutMidLine(),
-        MLBStrikeoutLowLines()
+        # MLBStrikeoutGolden(),
+        # MLBStrikeoutFavoriteOvers(),
+        # MLBStrikeoutMidLine(),
+        # MLBStrikeoutLowLines(),
+        MLB1HTierOne(),
+        MLB1HFadeGaps(),
+        MLB1HFadeLateReach(),
+        MLB1HFadeWhales()
     ]
 }
 class Runner:
