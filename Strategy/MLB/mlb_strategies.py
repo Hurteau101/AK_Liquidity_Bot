@@ -154,7 +154,7 @@ class MLB1HTierOne(Strategy):
 
 
         matched = (
-                modified_start_date_dt <= current_pacific_time <= pacific_start_dt
+                current_pacific_time <= modified_start_date_dt
                 and "under" in liquidity_context.highest_order.get("side", '').lower()
                 and self.is_favorite_odds(highest_order_odds=liquidity_context.highest_order.get("american_price", 0))
                 and liquidity_context.liquidity_difference >= self.LOWEST_LIQUIDITY_DIFFERENCE
