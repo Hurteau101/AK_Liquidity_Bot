@@ -34,7 +34,7 @@ STRATEGIES_PER_RUN = {
         MLB1HTierOne(),
         MLB1HFadeGaps(),
         MLB1HFadeLateReach(),
-        MLB1HFadeWhales()
+        # MLB1HFadeWhales()
     ]
 }
 class Runner:
