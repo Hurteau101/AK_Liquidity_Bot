@@ -154,10 +154,10 @@ class MLB1HTierOne(Strategy):
 
 
         matched = (
-            current_pacific_time >= modified_start_date_dt
-            and "under" in liquidity_context.highest_order.get("side", '').lower()
-            and self.is_favorite_odds(highest_order_odds=liquidity_context.highest_order.get("american_price", 0))
-            and liquidity_context.liquidity_difference >= self.LOWEST_LIQUIDITY_DIFFERENCE
+                modified_start_date_dt <= current_pacific_time <= pacific_start_dt
+                and "under" in liquidity_context.highest_order.get("side", '').lower()
+                and self.is_favorite_odds(highest_order_odds=liquidity_context.highest_order.get("american_price", 0))
+                and liquidity_context.liquidity_difference >= self.LOWEST_LIQUIDITY_DIFFERENCE
         )
 
         if not matched:
@@ -234,12 +234,12 @@ class MLB1HFadeLateReach(Strategy):
         current_pacific_time = datetime.now(pacific)
 
         matched = (
-            current_pacific_time >= modified_start_date_dt and
-            (
+                modified_start_date_dt <= current_pacific_time <= pacific_start_dt and
+                (
                 "over" in liquidity_context.highest_order.get("side", '').lower()
             )
-            or
-            (
+                or
+                (
                 "under" in liquidity_context.highest_order.get("side", '').lower()
                 and self.is_underdog_odds(highest_order_odds=liquidity_context.highest_order.get("american_price", 0))
             )
