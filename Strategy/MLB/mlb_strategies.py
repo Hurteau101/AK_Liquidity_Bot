@@ -188,15 +188,17 @@ class MLB1HFadeGaps(Strategy):
             return False
 
         matched = (
-            liquidity_context.liquidity_difference >= self.LOWEST_LIQUIDITY_DIFFERENCE and
-            (
-                "over" in liquidity_context.highest_order.get("side", '').lower()
-                and self.is_underdog_odds(highest_order_odds=liquidity_context.highest_order.get("american_price", 0))
-            )
-            or
-            (
-                "under" in liquidity_context.highest_order.get("side", '').lower()
-                and self.is_favorite_odds(highest_order_odds=liquidity_context.highest_order.get("american_price", 0))
+            liquidity_context.liquidity_difference >= self.LOWEST_LIQUIDITY_DIFFERENCE
+            and (
+                (
+                    "over" in liquidity_context.highest_order.get("side", '').lower()
+                    and self.is_underdog_odds(highest_order_odds=liquidity_context.highest_order.get("american_price", 0))
+                )
+                or
+                (
+                    "under" in liquidity_context.highest_order.get("side", '').lower()
+                    and self.is_favorite_odds(highest_order_odds=liquidity_context.highest_order.get("american_price", 0))
+                )
             )
         )
 
@@ -234,14 +236,16 @@ class MLB1HFadeLateReach(Strategy):
         current_pacific_time = datetime.now(pacific)
 
         matched = (
-                modified_start_date_dt <= current_pacific_time <= pacific_start_dt and
+            modified_start_date_dt <= current_pacific_time <= pacific_start_dt
+            and (
                 (
-                "over" in liquidity_context.highest_order.get("side", '').lower()
-            )
+                    "over" in liquidity_context.highest_order.get("side", '').lower()
+                )
                 or
                 (
-                "under" in liquidity_context.highest_order.get("side", '').lower()
-                and self.is_underdog_odds(highest_order_odds=liquidity_context.highest_order.get("american_price", 0))
+                    "under" in liquidity_context.highest_order.get("side", '').lower()
+                    and self.is_underdog_odds(highest_order_odds=liquidity_context.highest_order.get("american_price", 0))
+                )
             )
         )
 
